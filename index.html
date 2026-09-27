@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0f12">
+<link rel="manifest" href="manifest.json">
+<title>TimeTrack</title>
+<style>
+:root{--bg:#0b0f12;--card:#141a1f;--line:#232b32;--fg:#e6edf3;--muted:#8b98a5;--acc:#4ade80;--warn:#f87171;--blue:#60a5fa}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+header{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--bg);z-index:10}
+header h1{font-size:16px;margin:0;font-weight:600}
+header .now{font-size:12px;color:var(--muted)}
+nav{display:flex;overflow-x:auto;border-bottom:1px solid var(--line);position:sticky;top:49px;background:var(--bg);z-index:10}
+nav button{flex:1;min-width:80px;background:none;border:0;color:var(--muted);padding:10px 6px;font-size:12px;cursor:pointer}
+nav button.on{color:var(--acc);border-bottom:2px solid var(--acc)}
+main{padding:12px;max-width:720px;margin:0 auto}
+section{display:none}
+section.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
+label{display:block;font-size:12px;color:var(--muted);margin:6px 0 4px}
+input,select,button,textarea{font:inherit;color:var(--fg);background:#0e1418;border:1px solid var(--line);border-radius:8px;padding:8px;width:100%}
+textarea{min-height:50px;resize:vertical}
+button.primary{background:var(--acc);color:#04140a;border:0;font-weight:600;padding:12px;cursor:pointer}
+button.danger{background:var(--warn);color:#1a0505;border:0;font-weight:600;cursor:pointer}
+button.ghost{background:transparent;color:var(--fg);cursor:pointer}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+.big{font-size:34px;font-weight:700;text-align:center;letter-spacing:1px;margin:6px 0}
+.muted{color:var(--muted);font-size:12px}
+.running{border-left:3px solid var(--acc);padding-left:8px}
+.entry{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
+.entry:last-child{border-bottom:0}
+.entry .meta{font-size:12px;color:var(--muted)}
+.pill{display:inline-block;font-size:11px;padding:2px 6px;border-radius:6px;background:#1e262d;color:var(--muted);margin-right:4px}
+.pill.cat{color:#04140a}
+canvas{width:100%;height:180px;display:block}
+.hidden{display:none}
+.tabs{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.tabs button{flex:0 0 auto;width:auto;padding:6px 10px;font-size:12px}
+.tabs button.on{background:var(--acc);color:#04140a;border-color:var(--acc)}
+.cat-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
+.cat-row:last-child{border-bottom:0}
+.swatch{width:14px;height:14px;border-radius:4px;flex:0 0 auto}
+.sub{font-size:12px;color:var(--muted);padding-left:22px}
+</style>
+</head>
+<body>
+<header>
+  <h1>TimeTrack</h1>
+  <div class="now" id="nowIST">—</div>
+</header>
+<nav>
+  <button data-tab="timer" class="on">Timer</button>
+  <button data-tab="entries">Entries</button>
+  <button data-tab="dashboard">Dashboard</button>
+  <button data-tab="categories">Categories</button>
+  <button data-tab="settings">Settings</button>
+</nav>
+<main>
+
+<section id="s-timer" class="on">
+  <div class="card">
+    <label>Category</label>
+    <select id="tCat"></select>
+    <label>Subcategory (optional)</label>
+    <select id="tSub"><option value="">— none —</option></select>
+    <label>Work name</label>
+    <input id="tWork" placeholder="e.g. Report writing">
+    <label>Note (optional)</label>
+    <input id="tNote" placeholder="">
+    <div style="height:10px"></div>
+    <button class="primary" id="tStart">▶ Start</button>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <strong>Running</strong>
+      <span class="muted" id="todayTotal">Today: 00:00</span>
+    </div>
+    <div id="runningList"></div>
+  </div>
+</section>
+
+<section id="s-entries">
+  <div class="card">
+    <div class="row">
+      <button class="ghost" id="eAdd">+ Add missed entry</button>
+    </div>
+  </div>
+  <div id="entriesList"></div>
+</section>
+
+<section id="s-dashboard">
+  <div class="card">
+    <div class="tabs" id="dRange">
+      <button data-r="today" class="on">Today</button>
+      <button data-r="7">7 days</button>
+      <button data-r="30">30 days</button>
+      <button data-r="custom">Custom</button>
+    </div>
+    <div id="dCustom" class="hidden row">
+      <input type="date" id="dFrom"><input type="date" id="dTo">
+    </div>
+    <div style="margin-top:8px" class="row">
+      <div><label>Total</label><div class="big" id="dTotal">00:00</div></div>
+    </div>
+    <canvas id="dChart"></canvas>
+    <div id="dByCat" style="margin-top:8px"></div>
+    <div id="dByWork" style="margin-top:8px"></div>
+  </div>
+</section>
+
+<section id="s-categories">
+  <div class="card">
+    <label>New category name</label>
+    <div class="row">
+      <input id="cName" placeholder="Category name">
+      <input id="cColor" type="color" value="#4ade80" style="flex:0 0 60px;padding:2px">
+    </div>
+    <div style="height:8px"></div>
+    <button class="primary" id="cAdd">Add category</button>
+  </div>
+  <div class="card" id="catList"></div>
+</section>
+
+<section id="s-settings">
+  <div class="card">
+    <label>Duration display</label>
+    <select id="sDisp">
+      <option value="hhmm">HH:MM</option>
+      <option value="min">Total minutes</option>
+    </select>
+    <label>Auto-delete entries older than</label>
+    <select id="sRet">
+      <option value="0">Never</option>
+      <option value="3">3 days</option>
+      <option value="5">5 days</option>
+      <option value="7">7 days</option>
+      <option value="9">9 days</option>
+      <option value="15">15 days</option>
+      <option value="30">30 days</option>
+    </select>
+    <p class="muted">Cleanup runs when the app opens.</p>
+  </div>
+  <div class="card">
+    <label>Export range</label>
+    <div class="tabs" id="xRange">
+      <button data-r="7" class="on">7 days</button>
+      <button data-r="30">30 days</button>
+      <button data-r="all">All</button>
+      <button data-r="custom">Custom</button>
+    </div>
+    <div id="xCustom" class="hidden row">
+      <input type="date" id="xFrom"><input type="date" id="xTo">
+    </div>
+    <div style="height:8px"></div>
+    <div class="row">
+      <button class="primary" id="xCSV">Export CSV</button>
+      <button class="primary" id="xJSON">Export JSON</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ---------- utilities ----------
+const IST='Asia/Kolkata';
+const $=s=>document.querySelector(s);
+const $$=s=>document.querySelectorAll(s);
+function nowMs(){return Date.now()}
+function fmtIST(ms,opts){return new Intl.DateTimeFormat('en-GB',{timeZone:IST,...opts}).format(new Date(ms))}
+function istDateKey(ms){return new Intl.DateTimeFormat('en-CA',{timeZone:IST,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(ms))}
+function istTime(ms){return fmtIST(ms,{hour:'2-digit',minute:'2-digit',hour12:false})}
+function istDate(ms){return fmtIST(ms,{day:'2-digit',month:'short',year:'numeric'})}
+function durMin(a,b){return Math.max(0,Math.round((b-a)/60000))}
+function fmtDur(min){const h=Math.floor(min/60),m=min%60;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')}
+function dispDur(min){return settings.disp==='min'?String(min):fmtDur(min)}
+function el(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e}
+function pad2(n){return String(n).padStart(2,'0')}
+
+// ---------- db ----------
+let db;
+function openDB(){
+  return new Promise((res,rej)=>{
+    const req=indexedDB.open('timetrack',1);
+    req.onupgradeneeded=e=>{
+      const d=e.target.result;
+      if(!d.objectStoreNames.contains('categories'))d.createObjectStore('categories',{keyPath:'id',autoIncrement:true});
+      if(!d.objectStoreNames.contains('subcategories')){
+        const s=d.createObjectStore('subcategories',{keyPath:'id',autoIncrement:true});
+        s.createIndex('category_id','category_id');
+      }
+      if(!d.objectStoreNames.contains('entries')){
+        const s=d.createObjectStore('entries',{keyPath:'id',autoIncrement:true});
+        s.createIndex('start','start');s.createIndex('category_id','category_id');
+      }
+      if(!d.objectStoreNames.contains('settings'))d.createObjectStore('settings',{keyPath:'k'});
+    };
+    req.onsuccess=e=>{db=e.target.result;res()};
+    req.onerror=e=>rej(e.target.error);
+  });
+}
+function tx(store,mode='readonly'){return db.transaction(store,mode).objectStore(store)}
+function p(r){return new Promise((res,rej)=>{r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+function getAll(s){return p(tx(s).getAll())}
+function getOne(s,id){return p(tx(s).get(id))}
+function put(s,v){return p(tx(s,'readwrite').put(v))}
+function del(s,id){return p(tx(s,'readwrite').delete(id))}
+
+// ---------- settings ----------
+let settings={disp:'hhmm',ret:0};
+
+// ---------- state ----------
+let cats=[],subs=[],entries=[],running=[];
+let tick=null;
+
+// ---------- init ----------
+async function init(){
+  await openDB();
+  await loadSettings();
+  await loadAll();
+  await cleanup();
+  await ensureDefaults();
+  bindTabs();
+  bindTimer();
+  bindEntries();
+  bindDashboard();
+  bindCategories();
+  bindSettings();
+  renderAll();
+  startTicker();
+  setInterval(()=>$('#nowIST').textContent=istDate(nowMs())+' '+istTime(nowMs())+' IST',1000);
+  $('#nowIST').textContent=istDate(nowMs())+' '+istTime(nowMs())+' IST';
+  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+}
+async function loadSettings(){
+  const r=await p(tx('settings').get('main'));
+  if(r&&r.v)settings=Object.assign(settings,r.v);
+}
+async function saveSettings(){await put('settings',{k:'main',v:settings})}
+async function loadAll(){
+  cats=await getAll('categories');
+  subs=await getAll('subcategories');
+  entries=await getAll('entries');
+  entries.sort((a,b)=>b.start-a.start);
+  running=entries.filter(e=>!e.end);
+}
+async function ensureDefaults(){
+  if(cats.length)return;
+  const defaults=[['Work','#4ade80'],['Learning','#60a5fa'],['Health','#f59e0b'],['Admin','#a78bfa'],['Family','#f472b6'],['Distraction','#f87171'],['Neutral','#94a3b8']];
+  for(let i=0;i<defaults.length;i++){
+    await put('categories',{name:defaults[i][0],color:defaults[i][1],sort:i,archived:false});
+  }
+  cats=await getAll('categories');
+}
+async function cleanup(){
+  if(!settings.ret)return;
+  const cutoff=nowMs()-settings.ret*86400000;
+  for(const e of entries){if(e.end&&e.end<cutoff)await del('entries',e.id)}
+  entries=await getAll('entries');entries.sort((a,b)=>b.start-a.start);
+}
+
+// ---------- tabs ----------
+function bindTabs(){
+  $$('nav button').forEach(b=>b.onclick=()=>{
+    $$('nav button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    $$('main section').forEach(s=>s.classList.remove('on'));
+    $('#s-'+b.dataset.tab).classList.add('on');
+    if(b.dataset.tab==='dashboard')renderDashboard();
+  });
+}
+
+// ---------- timer ----------
+function bindTimer(){
+  $('#tCat').onchange=()=>{fillSubs();};
+  $('#tStart').onclick=async()=>{
+    const cid=Number($('#tCat').value);
+    if(!cid){alert('Pick a category');return}
+    const sub=$('#tSub').value?Number($('#tSub').value):null;
+    const work=$('#tWork').value.trim()||'(untitled)';
+    const note=$('#tNote').value.trim();
+    await put('entries',{category_id:cid,subcategory_id:sub,work_name:work,start:nowMs(),end:null,note,created_at:nowMs(),updated_at:nowMs()});
+    $('#tWork').value='';$('#tNote').value='';
+    await loadAll();renderAll();
+  };
+}
+function fillCats(){
+  const sel=$('#tCat');
+  const cur=sel.value;
+  sel.innerHTML='';
+  cats.filter(c=>!c.archived).forEach(c=>{
+    const o=document.createElement('option');o.value=c.id;o.textContent=c.name;sel.appendChild(o);
+  });
+  if(cur)sel.value=cur;
+  fillSubs();
+}
+function fillSubs(){
+  const cid=Number($('#tCat').value);
+  const sel=$('#tSub');sel.innerHTML='<option value="">— none —</option>';
+  subs.filter(s=>s.category_id===cid&&!s.archived).forEach(s=>{
+    const o=document.createElement('option');o.value=s.id;o.textContent=s.name;sel.appendChild(o);
+  });
+}
+function catById(id){return cats.find(c=>c.id===id)}
+function subById(id){return subs.find(s=>s.id===id)}
+
+function startTicker(){
+  if(tick)clearInterval(tick);
+  tick=setInterval(()=>{
+    if(!running.length){return}
+    running.forEach(e=>{
+      const el=document.getElementById('run-'+e.id);
+      if(el){el.querySelector('.elapsed').textContent=fmtDur(durMin(e.start,nowMs()))}
+    });
+    updateTodayTotal();
+  },1000);
+}
+function updateTodayTotal(){
+  const key=istDateKey(nowMs());
+  let t=0;
+  for(const e of entries){
+    if(istDateKey(e.start)!==key)continue;
+    t+=durMin(e.start,e.end||nowMs());
+  }
+  $('#todayTotal').textContent='Today: '+dispDur(t);
+}
+
+// ---------- render ----------
+function renderAll(){
+  fillCats();
+  renderRunning();
+  renderEntries();
+  renderCategories();
+  renderSettings();
+  updateTodayTotal();
+}
+function renderRunning(){
+  const box=$('#runningList');box.innerHTML='';
+  if(!running.length){box.appendChild(el('div','muted','No running timers.'));return}
+  for(const e of running){
+    const c=catById(e.category_id);
+    const row=el('div','entry running');
+    row.id='run-'+e.id;
+    const left=el('div');
+    left.innerHTML=`<div><span class="pill cat" style="background:${c?c.color:'#888'}">${c?c.name:'?'}</span>${e.subcategory_id?'<span class="pill">'+((subById(e.subcategory_id)||{}).name||'')+'</span>':''}<strong>${e.work_name}</strong></div>
+      <div class="meta">Started ${istTime(e.start)} IST</div>`;
+    const right=el('div');
+    right.style.textAlign='right';
+    right.innerHTML=`<div class="elapsed" style="font-size:18px;font-weight:700">${fmtDur(durMin(e.start,nowMs()))}</div>`;
+    const b=el('button','danger','Stop');
+    b.style.width='auto';b.style.marginTop='6px';b.style.padding='6px 10px';
+    b.onclick=async()=>{e.end=nowMs();e.updated_at=nowMs();await put('entries',e);await loadAll();renderAll()};
+    right.appendChild(b);
+    row.appendChild(left);row.appendChild(right);
+    box.appendChild(row);
+  }
+}
+function renderEntries(){
+  const box=$('#entriesList');box.innerHTML='';
+  const byDay={};
+  for(const e of entries){
+    const k=istDateKey(e.start);
+    (byDay[k]=byDay[k]||[]).push(e);
+  }
+  const days=Object.keys(byDay).sort().reverse();
+  if(!days.length){box.appendChild(el('div','card muted','No entries yet.'));return}
+  for(const d of days){
+    const card=el('div','card');
+    const tot=byDay[d].reduce((s,e)=>s+durMin(e.start,e.end||nowMs()),0);
+    card.appendChild(el('div','muted',`${d} &nbsp; • &nbsp; total ${dispDur(tot)}`));
+    for(const e of byDay[d]){
+      const c=catById(e.category_id);
+      const row=el('div','entry');
+      const left=el('div');
+      left.innerHTML=`<div><span class="pill cat" style="background:${c?c.color:'#888'}">${c?c.name:'?'}</span>${e.subcategory_id?'<span class="pill">'+((subById(e.subcategory_id)||{}).name||'')+'</span>':''}<strong>${e.work_name}</strong></div>
+        <div class="meta">${istTime(e.start)} → ${e.end?istTime(e.end):'running'} (${e.end?'':''}) &nbsp; ${dispDur(durMin(e.start,e.end||nowMs()))}</div>`;
+      const right=el('div');
+      right.style.display='flex';right.style.gap='4px';
+      const eb=el('button','ghost','Edit');eb.style.width='auto';eb.style.padding='4px 8px';eb.style.fontSize='12px';
+      eb.onclick=()=>editEntry(e);
+      const db=el('button','ghost','Del');db.style.width='auto';db.style.padding='4px 8px';db.style.fontSize='12px';db.style.color='var(--warn)';
+      db.onclick=async()=>{if(confirm('Delete this entry?')){await del('entries',e.id);await loadAll();renderAll()}};
+      right.appendChild(eb);right.appendChild(db);
+      row.appendChild(left);row.appendChild(right);
+      card.appendChild(row);
+    }
+    box.appendChild(card);
+  }
+}
+function editEntry(e){
+  const c=catById(e.category_id);
+  const opts=cats.map(x=>`<option value="${x.id}" ${x.id===e.category_id?'selected':''}>${x.name}</option>`).join('');
+  const subOpts='<option value="">— none —</option>'+subs.filter(s=>s.category_id===e.category_id).map(s=>`<option value="${s.id}" ${s.id===e.subcategory_id?'selected':''}>${s.name}</option>`).join('');
+  const startL=istLocalInput(e.start);
+  const endL=e.end?istLocalInput(e.end):'';
+  const html=`<label>Category</label><select id="eeCat">${opts}</select>
+    <label>Subcategory</label><select id="eeSub">${subOpts}</select>
+    <label>Work name</label><input id="eeWork" value="${(e.work_name||'').replace(/"/g,'&quot;')}">
+    <label>Start (IST)</label><input id="eeStart" type="datetime-local" value="${startL}">
+    <label>End (IST, leave blank if running)</label><input id="eeEnd" type="datetime-local" value="${endL}">
+    <label>Note</label><input id="eeNote" value="${(e.note||'').replace(/"/g,'&quot;')}">
+    <div style="height:10px"></div>
+    <div class="row"><button class="primary" id="eeSave">Save</button><button class="ghost" id="eeCancel">Cancel</button></div>`;
+  const card=el('div','card',html);
+  card.style.borderColor='var(--acc)';
+  const box=$('#entriesList');
+  box.insertBefore(card,box.firstChild);
+  card.scrollIntoView({behavior:'smooth',block:'start'});
+  card.querySelector('#eeCat').onchange=()=>{
+    const cid=Number(card.querySelector('#eeCat').value);
+    card.querySelector('#eeSub').innerHTML='<option value="">— none —</option>'+subs.filter(s=>s.category_id===cid).map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  };
+  card.querySelector('#eeCancel').onclick=()=>card.remove();
+  card.querySelector('#eeSave').onclick=async()=>{
+    const cid=Number(card.querySelector('#eeCat').value);
+    const sub=card.querySelector('#eeSub').value?Number(card.querySelector('#eeSub').value):null;
+    const work=card.querySelector('#eeWork').value.trim()||'(untitled)';
+    const sMs=istLocalToMs(card.querySelector('#eeStart').value);
+    const eMs=card.querySelector('#eeEnd').value?istLocalToMs(card.querySelector('#eeEnd').value):null;
+    if(!sMs){alert('Invalid start');return}
+    if(eMs!=null&&eMs<sMs){alert('End before start');return}
+    Object.assign(e,{category_id:cid,subcategory_id:sub,work_name:work,start:sMs,end:eMs,note:card.querySelector('#eeNote').value.trim(),updated_at:nowMs()});
+    await put('entries',e);await loadAll();renderAll();
+  };
+}
+// IST <-> datetime-local helpers
+function istLocalInput(ms){
+  // produce YYYY-MM-DDTHH:MM in IST
+  const p=new Intl.DateTimeFormat('en-CA',{timeZone:IST,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date(ms));
+  const g=k=>p.find(x=>x.type===k).value;
+  return `${g('year')}-${g('month')}-${g('day')}T${g('hour')}:${g('minute')}`;
+}
+function istLocalToMs(s){
+  if(!s)return null;
+  const m=s.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/);
+  if(!m)return null;
+  const [_,Y,M,D,h,mi]=m;
+  // IST is UTC+5:30, no DST
+  const utc=Date.UTC(+Y,+M-1,+D,+h,+mi)-5.5*3600000;
+  return utc;
+}
+
+// ---------- entries toolbar ----------
+function bindEntries(){
+  $('#eAdd').onclick=()=>{
+    const c=cats[0];
+    if(!c){alert('Create a category first');return}
+    const e={category_id:c.id,subcategory_id:null,work_name:'(untitled)',start:nowMs(),end:nowMs(),note:'',created_at:nowMs(),updated_at:nowMs()};
+    editEntry(e);
+  };
+}
+
+// ---------- dashboard ----------
+let dRange='today',dFrom=null,dTo=null;
+function bindDashboard(){
+  $('#dRange').onclick=e=>{
+    if(e.target.tagName!=='BUTTON')return;
+    dRange=e.target.dataset.r;
+    $$('#dRange button').forEach(b=>b.classList.toggle('on',b.dataset.r===dRange));
+    $('#dCustom').classList.toggle('hidden',dRange!=='custom');
+    renderDashboard();
+  };
+  $('#dFrom').onchange=()=>{dFrom=$('#dFrom').value;renderDashboard()};
+  $('#dTo').onchange=()=>{dTo=$('#dTo').value;renderDashboard()};
+}
+function rangeBounds(){
+  const now=nowMs();
+  if(dRange==='today'){
+    const k=istDateKey(now);
+    return [istLocalToMs(k+'T00:00'),istLocalToMs(k+'T23:59')+59999];
+  }
+  if(dRange==='7')return [now-7*86400000,now];
+  if(dRange==='30')return [now-30*86400000,now];
+  if(dRange==='custom'){
+    if(!dFrom||!dTo)return [now-7*86400000,now];
+    return [istLocalToMs(dFrom+'T00:00'),istLocalToMs(dTo+'T23:59')+59999];
+  }
+  return [now-86400000,now];
+}
+function renderDashboard(){
+  const [from,to]=rangeBounds();
+  const list=entries.filter(e=>{
+    const s=e.start;
+    const en=e.end||nowMs();
+    return s<=to && en>=from;
+  });
+  let total=0;
+  const byCat={},byWork={};
+  const byDay={};
+  for(const e of list){
+    const s=Math.max(e.start,from);
+    const en=Math.min(e.end||nowMs(),to);
+    if(en<=s)continue;
+    const m=durMin(s,en);
+    total+=m;
+    byCat[e.category_id]=(byCat[e.category_id]||0)+m;
+    const wk=(catById(e.category_id)||{}).name+' — '+e.work_name;
+    byWork[wk]=(byWork[wk]||0)+m;
+    const dk=istDateKey(s);
+    byDay[dk]=(byDay[dk]||0)+m;
+  }
+  $('#dTotal').textContent=dispDur(total);
+  // chart
+  const days=Object.keys(byDay).sort();
+  drawChart(days.map(d=>byDay[d]));
+  // by cat
+  const catBox=$('#dByCat');catBox.innerHTML='';
+  const catArr=Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+  for(const [cid,m] of catArr){
+    const c=catById(Number(cid));
+    const row=el('div','entry');
+    row.innerHTML=`<div><span class="pill cat" style="background:${c?c.color:'#888'}">${c?c.name:'?'}</span></div><div>${dispDur(m)}</div>`;
+    catBox.appendChild(row);
+  }
+  // by work
+  const workBox=$('#dByWork');workBox.innerHTML='';
+  const workArr=Object.entries(byWork).sort((a,b)=>b[1]-a[1]);
+  for(const [w,m] of workArr){
+    const row=el('div','entry');
+    row.innerHTML=`<div>${w}</div><div>${dispDur(m)}</div>`;
+    workBox.appendChild(row);
+  }
+}
+function drawChart(values){
+  const cv=$('#dChart');
+  const dpr=window.devicePixelRatio||1;
+  const w=cv.clientWidth||320,h=cv.clientHeight||180;
+  cv.width=w*dpr;cv.height=h*dpr;
+  const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,w,h);
+  if(!values.length)return;
+  const max=Math.max(1,...values);
+  const pad=20,bw=(w-pad*2)/values.length;
+  ctx.fillStyle='#8b98a5';ctx.font='10px system-ui';
+  values.forEach((v,i)=>{
+    const bh=(h-pad*2)*(v/max);
+    const x=pad+i*bw+bw*0.15;
+    const y=h-pad-bh;
+    ctx.fillStyle='#4ade80';
+    ctx.fillRect(x,y,bw*0.7,bh);
+  });
+  ctx.strokeStyle='#232b32';ctx.beginPath();ctx.moveTo(pad,h-pad);ctx.lineTo(w-pad,h-pad);ctx.stroke();
+}
+
+// ---------- categories ----------
+function bindCategories(){
+  $('#cAdd').onclick=async()=>{
+    const n=$('#cName').value.trim();
+    if(!n)return;
+    await put('categories',{name:n,color:$('#cColor').value,sort:cats.length,archived:false});
+    $('#cName').value='';
+    cats=await getAll('categories');renderAll();
+  };
+}
+function renderCategories(){
+  const box=$('#catList');box.innerHTML='';
+  const active=cats.filter(c=>!c.archived);
+  if(!active.length){box.appendChild(el('div','muted','No categories.'));return}
+  for(const c of active){
+    const row=el('div','cat-row');
+    const sw=el('div','swatch');sw.style.background=c.color;
+    const name=el('div','',c.name);name.style.flex='1';
+    const subBtn=el('button','ghost','+ sub');subBtn.style.width='auto';subBtn.style.padding='4px 8px';subBtn.style.fontSize='12px';
+    subBtn.onclick=()=>{
+      const n=prompt('Subcategory name under "'+c.name+'"');
+      if(!n)return;
+      put('subcategories',{category_id:c.id,name:n.trim(),sort:0,archived:false}).then(async()=>{subs=await getAll('subcategories');renderAll()});
+    };
+    const ren=el('button','ghost','Rename');ren.style.width='auto';ren.style.padding='4px 8px';ren.style.fontSize='12px';
+    ren.onclick=async()=>{
+      const n=prompt('New name',c.name);
+      if(!n)return;
+      c.name=n.trim();await put('categories',c);cats=await getAll('categories');renderAll();
+    };
+    const rm=el('button','ghost','Archive');rm.style.width='auto';rm.style.padding='4px 8px';rm.style.fontSize='12px';rm.style.color='var(--warn)';
+    rm.onclick=async()=>{if(confirm('Archive "'+c.name+'"?')){c.archived=true;await put('categories',c);cats=await getAll('categories');renderAll()}};
+    row.appendChild(sw);row.appendChild(name);row.appendChild(subBtn);row.appendChild(ren);row.appendChild(rm);
+    box.appendChild(row);
+    const mySubs=subs.filter(s=>s.category_id===c.id&&!s.archived);
+    for(const s of mySubs){
+      const sr=el('div','cat-row sub');
+      const sn=el('div','',s.name);sn.style.flex='1';
+      const sx=el('button','ghost','×');sx.style.width='auto';sx.style.padding='2px 8px';sx.style.color='var(--warn)';
+      sx.onclick=async()=>{if(confirm('Remove subcategory "'+s.name+'"?')){s.archived=true;await put('subcategories',s);subs=await getAll('subcategories');renderAll()}};
+      sr.appendChild(sn);sr.appendChild(sx);
+      box.appendChild(sr);
+    }
+  }
+}
+
+// ---------- settings ----------
+function bindSettings(){
+  $('#sDisp').onchange=async()=>{settings.disp=$('#sDisp').value;await saveSettings();renderAll()};
+  $('#sRet').onchange=async()=>{settings.ret=Number($('#sRet').value);await saveSettings();await cleanup();renderAll()};
+  $('#xRange').onclick=e=>{
+    if(e.target.tagName!=='BUTTON')return;
+    $$('#xRange button').forEach(b=>b.classList.toggle('on',b===e.target));
+    $('#xCustom').classList.toggle('hidden',e.target.dataset.r!=='custom');
+  };
+  $('#xCSV').onclick=()=>doExport('csv');
+  $('#xJSON').onclick=()=>doExport('json');
+}
+function renderSettings(){
+  $('#sDisp').value=settings.disp;
+  $('#sRet').value=settings.ret;
+}
+function exportBounds(){
+  const active=$$('#xRange button').find(b=>b.classList.contains('on'));
+  const r=active?active.dataset.r:'7';
+  const now=nowMs();
+  if(r==='7')return [now-7*86400000,now];
+  if(r==='30')return [now-30*86400000,now];
+  if(r==='all')return [0,now];
+  const f=$('#xFrom').value,t=$('#xTo').value;
+  if(!f||!t)return [now-7*86400000,now];
+  return [istLocalToMs(f+'T00:00'),istLocalToMs(t+'T23:59')+59999];
+}
+function doExport(kind){
+  const [from,to]=exportBounds();
+  const list=entries.filter(e=>e.start>=from&&e.start<=to).sort((a,b)=>a.start-b.start);
+  const rows=[['Category','Subcategory','Work','Start (IST)','End (IST)','Duration (min)','Duration HH:MM','Note']];
+  for(const e of list){
+    const c=catById(e.category_id)||{};
+    const s=subById(e.subcategory_id)||{};
+    const end=e.end||nowMs();
+    const m=durMin(e.start,end);
+    rows.push([c.name||'',s.name||'',e.work_name||'',istDate(e.start)+' '+istTime(e.start),e.end?istDate(e.end)+' '+istTime(e.end):'(running)',String(m),fmtDur(m),e.note||'']);
+  }
+  const stamp=istDateKey(nowMs());
+  if(kind==='csv'){
+    const csv=rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+    download('timetrack-'+stamp+'.csv','text/csv',csv);
+  }else{
+    const payload={exported_at:new Date().toISOString(),timezone:'Asia/Kolkata',from:new Date(from).toISOString(),to:new Date(to).toISOString(),categories:cats,subcategories:subs,entries:list};
+    download('timetrack-'+stamp+'.json','application/json',JSON.stringify(payload,null,2));
+  }
+}
+function download(name,mime,text){
+  const blob=new Blob([text],{type:mime+';charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=name;a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+// ---------- go ----------
+init().catch(err=>{alert('Init failed: '+err.message);console.error(err)});
+</script>
+</body>
+</html>
