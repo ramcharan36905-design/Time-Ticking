@@ -3,66 +3,228 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0b0f12">
+<meta name="theme-color" content="#0a0d10">
 <link rel="manifest" href="manifest.json">
 <title>TimeTrack</title>
 <style>
-:root{--bg:#0b0f12;--card:#141a1f;--line:#232b32;--fg:#e6edf3;--muted:#8b98a5;--acc:#4ade80;--warn:#f87171;--blue:#60a5fa}
+:root{
+  --bg:#0a0d10;--surf:#141a20;--surf2:#1a2229;--line:#232b33;
+  --fg:#e8eef3;--muted:#7a8794;--acc:#4ade80;--acc2:#22d3ee;
+  --warn:#f87171;--r:14px;
+}
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
-header{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--bg);z-index:10}
-header h1{font-size:16px;margin:0;font-weight:600}
-header .now{font-size:12px;color:var(--muted)}
-nav{display:flex;overflow-x:auto;border-bottom:1px solid var(--line);position:sticky;top:49px;background:var(--bg);z-index:10}
-nav button{flex:1;min-width:80px;background:none;border:0;color:var(--muted);padding:10px 6px;font-size:12px;cursor:pointer}
-nav button.on{color:var(--acc);border-bottom:2px solid var(--acc)}
-main{padding:12px;max-width:720px;margin:0 auto}
-section{display:none}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);
+  font:14px/1.45 -apple-system,system-ui,"Segoe UI",Roboto,sans-serif;
+  -webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+button{font:inherit;cursor:pointer}
+input,select,textarea{font:inherit;color:var(--fg);background:var(--surf2);
+  border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;
+  transition:border-color .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acc)}
+
+header{position:sticky;top:0;z-index:20;background:rgba(10,13,16,.85);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
+  padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.logo{width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  display:grid;place-items:center;font-size:18px;flex:0 0 auto}
+.brand h1{font-size:15px;margin:0;font-weight:700;letter-spacing:-.2px}
+.brand .now{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.today-pill{background:var(--surf);border:1px solid var(--line);border-radius:999px;
+  padding:6px 12px;font-size:12px;font-weight:600;color:var(--acc);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+
+nav{display:flex;overflow-x:auto;gap:4px;padding:10px 12px;
+  border-bottom:1px solid var(--line);position:sticky;top:59px;z-index:19;
+  background:rgba(10,13,16,.85);backdrop-filter:blur(12px);scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:0 0 auto;background:transparent;border:0;color:var(--muted);
+  padding:8px 14px;font-size:13px;font-weight:500;border-radius:999px;transition:all .15s}
+nav button.on{background:var(--surf);color:var(--fg);font-weight:600}
+
+main{padding:14px;max-width:820px;margin:0 auto;padding-bottom:80px}
+section{display:none;animation:fade .2s}
 section.on{display:block}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
-label{display:block;font-size:12px;color:var(--muted);margin:6px 0 4px}
-input,select,button,textarea{font:inherit;color:var(--fg);background:#0e1418;border:1px solid var(--line);border-radius:8px;padding:8px;width:100%}
-textarea{min-height:50px;resize:vertical}
-button.primary{background:var(--acc);color:#04140a;border:0;font-weight:600;padding:12px;cursor:pointer}
-button.danger{background:var(--warn);color:#1a0505;border:0;font-weight:600;cursor:pointer}
-button.ghost{background:transparent;color:var(--fg);cursor:pointer}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.card{background:var(--surf);border:1px solid var(--line);border-radius:var(--r);
+  padding:14px;margin-bottom:12px}
+.card h2{font-size:12px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.6px;margin:0 0 12px}
+label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px;font-weight:500}
 .row{display:flex;gap:8px}
 .row>*{flex:1}
-.big{font-size:34px;font-weight:700;text-align:center;letter-spacing:1px;margin:6px 0}
+
+.btn{background:var(--surf2);color:var(--fg);border:1px solid var(--line);
+  border-radius:10px;padding:11px 14px;font-weight:600;font-size:13px;transition:all .15s}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:linear-gradient(135deg,var(--acc),#22c55e);color:#031208;border:0}
+.btn.danger{background:transparent;color:var(--warn);border-color:rgba(248,113,113,.3)}
+.btn.ghost{background:transparent;color:var(--muted);border-color:var(--line)}
+
+.big{font-size:38px;font-weight:800;letter-spacing:-1px;
+  font-variant-numeric:tabular-nums;line-height:1}
 .muted{color:var(--muted);font-size:12px}
-.running{border-left:3px solid var(--acc);padding-left:8px}
-.entry{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
-.entry:last-child{border-bottom:0}
-.entry .meta{font-size:12px;color:var(--muted)}
-.pill{display:inline-block;font-size:11px;padding:2px 6px;border-radius:6px;background:#1e262d;color:var(--muted);margin-right:4px}
-.pill.cat{color:#04140a}
-canvas{width:100%;height:180px;display:block}
 .hidden{display:none}
-.tabs{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
-.tabs button{flex:0 0 auto;width:auto;padding:6px 10px;font-size:12px}
-.tabs button.on{background:var(--acc);color:#04140a;border-color:var(--acc)}
-.cat-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
-.cat-row:last-child{border-bottom:0}
-.swatch{width:14px;height:14px;border-radius:4px;flex:0 0 auto}
-.sub{font-size:12px;color:var(--muted);padding-left:22px}
+
+/* Pins */
+.pins{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.pin{background:var(--surf2);border:1px solid var(--line);border-radius:12px;
+  padding:12px;position:relative;transition:all .15s;cursor:pointer;
+  text-align:left;color:var(--fg);min-height:78px}
+.pin:active{transform:scale(.97)}
+.pin.running{border-color:var(--acc);background:rgba(74,222,128,.08);
+  box-shadow:0 0 0 1px var(--acc) inset}
+.pin .ct{font-size:10px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.5px;font-weight:700;margin-bottom:4px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pin .nm{font-weight:600;font-size:13px;margin-bottom:4px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pin .tm{font-size:20px;font-weight:800;color:var(--acc);
+  font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+.pin .rm{position:absolute;top:6px;right:6px;width:20px;height:20px;
+  border-radius:50%;background:rgba(0,0,0,.3);border:0;color:var(--muted);
+  font-size:12px;line-height:1;display:grid;place-items:center;padding:0}
+.pin.add{background:transparent;border-style:dashed;text-align:center;
+  display:grid;place-items:center;color:var(--muted);font-weight:600;font-size:12px}
+.pin.add .plus{font-size:22px;line-height:1;margin-bottom:4px;color:var(--acc)}
+
+/* Running */
+.run-item{display:flex;justify-content:space-between;align-items:center;
+  gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.run-item:last-child{border-bottom:0}
+.run-item .nm{font-weight:600;font-size:13px}
+.run-item .meta{font-size:11px;color:var(--muted);margin-top:2px}
+.run-item .el{font-size:20px;font-weight:800;color:var(--acc);
+  font-variant-numeric:tabular-nums;letter-spacing:-.5px;text-align:right}
+.run-item .stop{background:var(--warn);color:#1a0505;border:0;border-radius:8px;
+  padding:6px 12px;font-weight:700;font-size:12px;margin-top:4px}
+
+/* Log */
+.day-head{display:flex;justify-content:space-between;align-items:baseline;
+  padding:6px 0 10px;border-bottom:1px solid var(--line);margin-bottom:10px}
+.day-head .d{font-weight:700;font-size:14px}
+.day-head .t{color:var(--acc);font-weight:700;font-size:13px;
+  font-variant-numeric:tabular-nums}
+.task-group{padding:10px 0;border-bottom:1px solid var(--line)}
+.task-group:last-child{border-bottom:0}
+.task-group .th{display:flex;justify-content:space-between;align-items:center;
+  gap:8px;padding:2px 0 6px}
+.task-group .th .tn{font-weight:600;font-size:13px;
+  display:flex;align-items:center;gap:6px;min-width:0}
+.task-group .th .tn .dot{width:8px;height:8px;border-radius:3px;flex:0 0 auto}
+.task-group .th .tn .tt2{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.task-group .th .t{font-weight:700;color:var(--acc);font-size:13px;
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.sess{display:flex;justify-content:space-between;align-items:center;gap:8px;
+  padding:6px 0 6px 12px;font-size:12px;color:var(--muted);
+  border-left:2px solid var(--line);margin-left:7px;margin-top:4px}
+.sess .st{font-variant-numeric:tabular-nums}
+.sess .sd{color:var(--fg);font-variant-numeric:tabular-nums;font-weight:600}
+.sess .sx{background:transparent;border:0;color:var(--muted);font-size:12px;
+  padding:2px 6px;width:auto;flex:0 0 auto}
+
+/* Compare */
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button{flex:0 0 auto;width:auto;background:var(--surf2);border:1px solid var(--line);
+  color:var(--muted);padding:7px 14px;border-radius:999px;font-size:12px;font-weight:600}
+.tabs button.on{background:var(--acc);color:#031208;border-color:var(--acc)}
+canvas{width:100%;height:150px;display:block;margin:8px 0}
+
+/* Pivot */
+.pivot-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;
+  border:1px solid var(--line);border-radius:12px;background:var(--surf2)}
+table.pivot{border-collapse:collapse;width:max-content;min-width:100%;font-size:12px}
+table.pivot th,table.pivot td{padding:9px 10px;text-align:right;white-space:nowrap;
+  border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+table.pivot th{background:var(--surf);font-weight:700;color:var(--muted);
+  font-size:10px;text-transform:uppercase;letter-spacing:.4px;position:sticky;top:0}
+table.pivot th.today{color:var(--acc)}
+table.pivot td.today{background:rgba(74,222,128,.06)}
+table.pivot td.tk,table.pivot th.tk{text-align:left;position:sticky;left:0;
+  background:var(--surf2);z-index:2;min-width:140px;max-width:180px;
+  overflow:hidden;text-overflow:ellipsis;border-right:1px solid var(--line);
+  font-weight:600;color:var(--fg)}
+table.pivot th.tk{background:var(--surf);z-index:3}
+table.pivot td.tot,table.pivot th.tot{color:var(--acc);font-weight:700;
+  border-left:1px solid var(--line)}
+table.pivot tr:last-child td{border-bottom:0}
+table.pivot td.zero{color:#3b444d}
+table.pivot .dot{display:inline-block;width:7px;height:7px;border-radius:2px;
+  margin-right:5px;vertical-align:middle}
+table.pivot .sub{font-size:10px;color:var(--muted);font-weight:400}
+
+/* Cat totals */
+.cat-tot{display:flex;justify-content:space-between;align-items:center;
+  padding:10px 0;border-bottom:1px solid var(--line)}
+.cat-tot:last-child{border-bottom:0}
+.cat-tot .nm{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px}
+.cat-tot .sw{width:10px;height:10px;border-radius:3px}
+.cat-tot .v{font-weight:700;color:var(--acc);font-variant-numeric:tabular-nums}
+
+/* Cat mgmt */
+.cat-item{display:flex;align-items:center;gap:8px;padding:10px 0;
+  border-bottom:1px solid var(--line)}
+.cat-item:last-child{border-bottom:0}
+.cat-item .nm{flex:1;font-weight:600;font-size:13px;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sub-item{padding:6px 0 6px 26px;display:flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--muted);border-bottom:1px solid var(--line)}
+.sub-item:last-child{border-bottom:0}
+.icon-btn{background:transparent;border:0;color:var(--muted);padding:6px;
+  font-size:13px;width:auto;flex:0 0 auto;border-radius:8px}
+.icon-btn:hover{background:var(--surf2);color:var(--fg)}
+
+/* Modal */
+.modal-back{position:fixed;inset:0;background:rgba(0,0,0,.6);
+  backdrop-filter:blur(4px);z-index:50;display:grid;place-items:end center;
+  animation:fade .15s}
+.modal{background:var(--surf);width:100%;max-width:600px;
+  border-radius:20px 20px 0 0;padding:20px;max-height:92vh;overflow-y:auto;
+  animation:up .25s cubic-bezier(.2,.9,.3,1)}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+.modal h3{margin:0 0 14px;font-size:16px;font-weight:700}
+.modal .row{margin-top:16px}
 </style>
 </head>
 <body>
+
 <header>
-  <h1>TimeTrack</h1>
-  <div class="now" id="nowIST">—</div>
+  <div class="brand">
+    <div class="logo">⏱</div>
+    <div>
+      <h1>TimeTrack</h1>
+      <div class="now" id="nowIST">—</div>
+    </div>
+  </div>
+  <div class="today-pill" id="todayTotalPill">Today 0m</div>
 </header>
+
 <nav>
   <button data-tab="timer" class="on">Timer</button>
-  <button data-tab="entries">Entries</button>
-  <button data-tab="dashboard">Dashboard</button>
+  <button data-tab="log">Log</button>
+  <button data-tab="compare">Compare</button>
   <button data-tab="categories">Categories</button>
   <button data-tab="settings">Settings</button>
 </nav>
+
 <main>
 
 <section id="s-timer" class="on">
   <div class="card">
+    <h2>Pinned tasks</h2>
+    <div class="pins" id="pinsGrid"></div>
+    <p class="muted" style="margin-top:10px">Tap a pin to start. Tap again to stop. Multiple sessions per day are fine.</p>
+  </div>
+
+  <div class="card">
+    <h2>Running now</h2>
+    <div id="runningList"></div>
+  </div>
+
+  <div class="card">
+    <h2>Manual start</h2>
     <label>Category</label>
     <select id="tCat"></select>
     <label>Subcategory (optional)</label>
@@ -71,122 +233,175 @@ canvas{width:100%;height:180px;display:block}
     <input id="tWork" placeholder="e.g. Report writing">
     <label>Note (optional)</label>
     <input id="tNote" placeholder="">
-    <div style="height:10px"></div>
-    <button class="primary" id="tStart">▶ Start</button>
-  </div>
-
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <strong>Running</strong>
-      <span class="muted" id="todayTotal">Today: 00:00</span>
-    </div>
-    <div id="runningList"></div>
+    <div style="height:12px"></div>
+    <button class="btn primary" id="tStart">▶ Start</button>
   </div>
 </section>
 
-<section id="s-entries">
+<section id="s-log">
   <div class="card">
-    <div class="row">
-      <button class="ghost" id="eAdd">+ Add missed entry</button>
-    </div>
+    <button class="btn ghost" id="eAdd">+ Add missed entry</button>
   </div>
   <div id="entriesList"></div>
 </section>
 
-<section id="s-dashboard">
+<section id="s-compare">
   <div class="card">
     <div class="tabs" id="dRange">
-      <button data-r="today" class="on">Today</button>
-      <button data-r="7">7 days</button>
-      <button data-r="30">30 days</button>
-      <button data-r="custom">Custom</button>
+      <button data-r="7" class="on">Last 7 days</button>
+      <button data-r="10">Last 10 days</button>
     </div>
-    <div id="dCustom" class="hidden row">
-      <input type="date" id="dFrom"><input type="date" id="dTo">
-    </div>
-    <div style="margin-top:8px" class="row">
-      <div><label>Total</label><div class="big" id="dTotal">00:00</div></div>
+    <div class="row" style="align-items:center;gap:10px">
+      <div>
+        <div class="muted">Total in range</div>
+        <div class="big" id="dTotal">0m</div>
+      </div>
     </div>
     <canvas id="dChart"></canvas>
-    <div id="dByCat" style="margin-top:8px"></div>
-    <div id="dByWork" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card">
+    <h2>Day-by-day by task</h2>
+    <div class="pivot-wrap" id="pivotWrap"></div>
+    <p class="muted" style="margin-top:8px">Scroll sideways. The rightmost column is the total.</p>
+  </div>
+
+  <div class="card">
+    <h2>By category</h2>
+    <div id="dByCat"></div>
   </div>
 </section>
 
 <section id="s-categories">
   <div class="card">
-    <label>New category name</label>
+    <h2>New category</h2>
+    <label>Name</label>
     <div class="row">
       <input id="cName" placeholder="Category name">
-      <input id="cColor" type="color" value="#4ade80" style="flex:0 0 60px;padding:2px">
+      <input id="cColor" type="color" value="#4ade80" style="flex:0 0 56px;padding:3px">
     </div>
-    <div style="height:8px"></div>
-    <button class="primary" id="cAdd">Add category</button>
+    <div style="height:10px"></div>
+    <button class="btn primary" id="cAdd">Add category</button>
   </div>
   <div class="card" id="catList"></div>
 </section>
 
 <section id="s-settings">
   <div class="card">
-    <label>Duration display</label>
+    <h2>Display</h2>
+    <label>Duration format</label>
     <select id="sDisp">
-      <option value="hhmm">HH:MM</option>
-      <option value="min">Total minutes</option>
+      <option value="hm">2h 15m</option>
+      <option value="min">135m</option>
+      <option value="hhmm">02:15</option>
     </select>
-    <label>Auto-delete entries older than</label>
+  </div>
+
+  <div class="card">
+    <h2>Auto-delete</h2>
+    <label>Delete entries older than</label>
     <select id="sRet">
       <option value="0">Never</option>
       <option value="3">3 days</option>
       <option value="5">5 days</option>
       <option value="7">7 days</option>
-      <option value="9">9 days</option>
+      <option value="10">10 days</option>
       <option value="15">15 days</option>
       <option value="30">30 days</option>
     </select>
-    <p class="muted">Cleanup runs when the app opens.</p>
+    <p class="muted" style="margin-top:6px">Runs automatically when the app opens.</p>
   </div>
+
   <div class="card">
-    <label>Export range</label>
+    <h2>Export</h2>
+    <label>Range</label>
     <div class="tabs" id="xRange">
       <button data-r="7" class="on">7 days</button>
-      <button data-r="30">30 days</button>
+      <button data-r="10">10 days</button>
       <button data-r="all">All</button>
-      <button data-r="custom">Custom</button>
     </div>
-    <div id="xCustom" class="hidden row">
-      <input type="date" id="xFrom"><input type="date" id="xTo">
+    <div class="row" style="margin-top:10px">
+      <button class="btn primary" id="xCSV">CSV</button>
+      <button class="btn primary" id="xJSON">JSON</button>
     </div>
-    <div style="height:8px"></div>
+  </div>
+
+  <div class="card">
+    <h2>Import</h2>
+    <p class="muted" style="margin-top:0">Merge entries from a JSON backup into this device. Duplicates skipped by start time + task.</p>
+    <label class="btn ghost" style="display:block;text-align:center;margin-top:10px">
+      Choose JSON file
+      <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+    </label>
+  </div>
+
+  <div class="card" style="border-color:rgba(248,113,113,.25)">
+    <h2 style="color:var(--warn)">Danger zone</h2>
+    <label>Delete entries older than N days (custom)</label>
     <div class="row">
-      <button class="primary" id="xCSV">Export CSV</button>
-      <button class="primary" id="xJSON">Export JSON</button>
+      <input type="number" id="customDays" min="1" placeholder="e.g. 7">
+      <button class="btn danger" id="customDel" style="flex:0 0 auto;width:auto">Delete</button>
     </div>
+    <div style="height:14px"></div>
+    <button class="btn danger" id="wipeAll" style="width:100%">Delete ALL data</button>
+    <p class="muted" style="margin-top:8px">Export first. This cannot be undone.</p>
   </div>
 </section>
 
 </main>
 
 <script>
-// ---------- utilities ----------
+// ---------- helpers ----------
 const IST='Asia/Kolkata';
 const $=s=>document.querySelector(s);
 const $$=s=>document.querySelectorAll(s);
-function nowMs(){return Date.now()}
-function fmtIST(ms,opts){return new Intl.DateTimeFormat('en-GB',{timeZone:IST,...opts}).format(new Date(ms))}
-function istDateKey(ms){return new Intl.DateTimeFormat('en-CA',{timeZone:IST,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(ms))}
-function istTime(ms){return fmtIST(ms,{hour:'2-digit',minute:'2-digit',hour12:false})}
-function istDate(ms){return fmtIST(ms,{day:'2-digit',month:'short',year:'numeric'})}
-function durMin(a,b){return Math.max(0,Math.round((b-a)/60000))}
-function fmtDur(min){const h=Math.floor(min/60),m=min%60;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')}
-function dispDur(min){return settings.disp==='min'?String(min):fmtDur(min)}
-function el(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e}
-function pad2(n){return String(n).padStart(2,'0')}
+const nowMs=()=>Date.now();
+const fmtIST=(ms,o)=>new Intl.DateTimeFormat('en-GB',{timeZone:IST,...o}).format(new Date(ms));
+const istDateKey=ms=>new Intl.DateTimeFormat('en-CA',{timeZone:IST,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(ms));
+const istTime=ms=>fmtIST(ms,{hour:'2-digit',minute:'2-digit',hour12:false});
+const istDateShort=ms=>fmtIST(ms,{day:'2-digit',month:'short'});
+const istWeekday=ms=>fmtIST(ms,{weekday:'short'});
+const durMin=(a,b)=>Math.max(0,Math.round((b-a)/60000));
+
+function fmtDur(min){
+  if(min<1)return '0m';
+  if(min<60)return min+'m';
+  const h=Math.floor(min/60),m=min%60;
+  return m? h+'h '+m+'m' : h+'h';
+}
+function dispDur(min){
+  if(settings.disp==='min')return min+'m';
+  if(settings.disp==='hhmm'){const h=Math.floor(min/60),m=min%60;return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');}
+  return fmtDur(min);
+}
+function el(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;}
+
+// IST <-> datetime-local helpers
+function istLocalInput(ms){
+  const p=new Intl.DateTimeFormat('en-CA',{timeZone:IST,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date(ms));
+  const g=k=>p.find(x=>x.type===k).value;
+  return `${g('year')}-${g('month')}-${g('day')}T${g('hour')}:${g('minute')}`;
+}
+function istLocalToMs(s){
+  if(!s)return null;
+  const m=s.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/);
+  if(!m)return null;
+  const [_,Y,M,D,h,mi]=m;
+  return Date.UTC(+Y,+M-1,+D,+h,+mi)-5.5*3600000;
+}
+function istMidnight(dateKey){return istLocalToMs(dateKey+'T00:00');}
+function lastNDays(n){
+  const out=[];
+  const now=nowMs();
+  for(let i=n-1;i>=0;i--)out.push(istDateKey(now-i*86400000));
+  return out;
+}
 
 // ---------- db ----------
 let db;
 function openDB(){
   return new Promise((res,rej)=>{
-    const req=indexedDB.open('timetrack',1);
+    const req=indexedDB.open('timetrack',2);
     req.onupgradeneeded=e=>{
       const d=e.target.result;
       if(!d.objectStoreNames.contains('categories'))d.createObjectStore('categories',{keyPath:'id',autoIncrement:true});
@@ -196,8 +411,9 @@ function openDB(){
       }
       if(!d.objectStoreNames.contains('entries')){
         const s=d.createObjectStore('entries',{keyPath:'id',autoIncrement:true});
-        s.createIndex('start','start');s.createIndex('category_id','category_id');
+        s.createIndex('start','start');
       }
+      if(!d.objectStoreNames.contains('pins'))d.createObjectStore('pins',{keyPath:'id',autoIncrement:true});
       if(!d.objectStoreNames.contains('settings'))d.createObjectStore('settings',{keyPath:'k'});
     };
     req.onsuccess=e=>{db=e.target.result;res()};
@@ -206,16 +422,15 @@ function openDB(){
 }
 function tx(store,mode='readonly'){return db.transaction(store,mode).objectStore(store)}
 function p(r){return new Promise((res,rej)=>{r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
-function getAll(s){return p(tx(s).getAll())}
-function getOne(s,id){return p(tx(s).get(id))}
-function put(s,v){return p(tx(s,'readwrite').put(v))}
-function del(s,id){return p(tx(s,'readwrite').delete(id))}
-
-// ---------- settings ----------
-let settings={disp:'hhmm',ret:0};
+const getAll=s=>p(tx(s).getAll());
+const put=(s,v)=>p(tx(s,'readwrite').put(v));
+const del=(s,id)=>p(tx(s,'readwrite').delete(id));
+const clearStore=s=>p(tx(s,'readwrite').clear());
 
 // ---------- state ----------
-let cats=[],subs=[],entries=[],running=[];
+let cats=[],subs=[],entries=[],pins=[],running=[];
+let settings={disp:'hm',ret:0};
+let compareRange=7;
 let tick=null;
 
 // ---------- init ----------
@@ -227,42 +442,47 @@ async function init(){
   await ensureDefaults();
   bindTabs();
   bindTimer();
-  bindEntries();
-  bindDashboard();
+  bindLog();
+  bindCompare();
   bindCategories();
   bindSettings();
   renderAll();
   startTicker();
-  setInterval(()=>$('#nowIST').textContent=istDate(nowMs())+' '+istTime(nowMs())+' IST',1000);
-  $('#nowIST').textContent=istDate(nowMs())+' '+istTime(nowMs())+' IST';
+  updateClock();
+  setInterval(updateClock,1000);
   if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 }
+function updateClock(){ $('#nowIST').textContent = istDateShort(nowMs())+' • '+istTime(nowMs())+' IST'; }
 async function loadSettings(){
   const r=await p(tx('settings').get('main'));
   if(r&&r.v)settings=Object.assign(settings,r.v);
 }
-async function saveSettings(){await put('settings',{k:'main',v:settings})}
+async function saveSettings(){await put('settings',{k:'main',v:settings});}
 async function loadAll(){
   cats=await getAll('categories');
   subs=await getAll('subcategories');
   entries=await getAll('entries');
+  pins=await getAll('pins');
   entries.sort((a,b)=>b.start-a.start);
   running=entries.filter(e=>!e.end);
 }
 async function ensureDefaults(){
   if(cats.length)return;
-  const defaults=[['Work','#4ade80'],['Learning','#60a5fa'],['Health','#f59e0b'],['Admin','#a78bfa'],['Family','#f472b6'],['Distraction','#f87171'],['Neutral','#94a3b8']];
-  for(let i=0;i<defaults.length;i++){
-    await put('categories',{name:defaults[i][0],color:defaults[i][1],sort:i,archived:false});
-  }
+  const d=[['Work','#4ade80'],['Learning','#60a5fa'],['Health','#f59e0b'],['Admin','#a78bfa'],['Family','#f472b6'],['Distraction','#f87171'],['Neutral','#94a3b8']];
+  for(let i=0;i<d.length;i++)await put('categories',{name:d[i][0],color:d[i][1],sort:i,archived:false});
   cats=await getAll('categories');
 }
 async function cleanup(){
   if(!settings.ret)return;
   const cutoff=nowMs()-settings.ret*86400000;
-  for(const e of entries){if(e.end&&e.end<cutoff)await del('entries',e.id)}
+  for(const e of entries){if(e.end&&e.end<cutoff)await del('entries',e.id);}
   entries=await getAll('entries');entries.sort((a,b)=>b.start-a.start);
 }
+
+// ---------- lookups ----------
+const catById=id=>cats.find(c=>c.id===id);
+const subById=id=>subs.find(s=>s.id===id);
+const sameTask=(e,c,s,w)=>(e.category_id===c)&&((e.subcategory_id||null)===(s||null))&&(e.work_name===w);
 
 // ---------- tabs ----------
 function bindTabs(){
@@ -271,16 +491,36 @@ function bindTabs(){
     b.classList.add('on');
     $$('main section').forEach(s=>s.classList.remove('on'));
     $('#s-'+b.dataset.tab).classList.add('on');
-    if(b.dataset.tab==='dashboard')renderDashboard();
+    if(b.dataset.tab==='compare')renderCompare();
   });
 }
 
-// ---------- timer ----------
+// ---------- render all ----------
+function renderAll(){
+  fillCatSelect();
+  renderPins();
+  renderRunning();
+  renderLog();
+  renderCategories();
+  renderSettings();
+  updateTodayPill();
+}
+function updateTodayPill(){
+  const key=istDateKey(nowMs());
+  let t=0;
+  for(const e of entries){
+    if(istDateKey(e.start)!==key)continue;
+    t+=durMin(e.start,e.end||nowMs());
+  }
+  $('#todayTotalPill').textContent='Today '+dispDur(t);
+}
+
+// ---------- timer manual ----------
 function bindTimer(){
-  $('#tCat').onchange=()=>{fillSubs();};
+  $('#tCat').onchange=fillSubSelect;
   $('#tStart').onclick=async()=>{
     const cid=Number($('#tCat').value);
-    if(!cid){alert('Pick a category');return}
+    if(!cid){alert('Pick a category');return;}
     const sub=$('#tSub').value?Number($('#tSub').value):null;
     const work=$('#tWork').value.trim()||'(untitled)';
     const note=$('#tNote').value.trim();
@@ -289,7 +529,7 @@ function bindTimer(){
     await loadAll();renderAll();
   };
 }
-function fillCats(){
+function fillCatSelect(){
   const sel=$('#tCat');
   const cur=sel.value;
   sel.innerHTML='';
@@ -297,70 +537,127 @@ function fillCats(){
     const o=document.createElement('option');o.value=c.id;o.textContent=c.name;sel.appendChild(o);
   });
   if(cur)sel.value=cur;
-  fillSubs();
+  fillSubSelect();
 }
-function fillSubs(){
+function fillSubSelect(){
   const cid=Number($('#tCat').value);
   const sel=$('#tSub');sel.innerHTML='<option value="">— none —</option>';
   subs.filter(s=>s.category_id===cid&&!s.archived).forEach(s=>{
     const o=document.createElement('option');o.value=s.id;o.textContent=s.name;sel.appendChild(o);
   });
 }
-function catById(id){return cats.find(c=>c.id===id)}
-function subById(id){return subs.find(s=>s.id===id)}
+
+// ---------- pins ----------
+function renderPins(){
+  const g=$('#pinsGrid');g.innerHTML='';
+  const todayKey=istDateKey(nowMs());
+  for(const pin of pins){
+    const c=catById(pin.category_id)||{name:'?',color:'#888'};
+    const isRun=running.some(e=>sameTask(e,pin.category_id,pin.subcategory_id,pin.work_name));
+    let todayMin=0;
+    for(const e of entries){
+      if(istDateKey(e.start)!==todayKey)continue;
+      if(!sameTask(e,pin.category_id,pin.subcategory_id,pin.work_name))continue;
+      todayMin+=durMin(e.start,e.end||nowMs());
+    }
+    const b=el('button','pin'+(isRun?' running':''));
+    b.innerHTML=`
+      <div class="ct" style="color:${c.color}">${c.name}</div>
+      <div class="nm">${pin.work_name}</div>
+      <div class="tm">${dispDur(todayMin)}</div>
+      <div class="rm" data-id="${pin.id}">×</div>`;
+    b.onclick=async(ev)=>{
+      if(ev.target.dataset.id){ev.stopPropagation();if(confirm('Remove this pin?')){await del('pins',pin.id);await loadAll();renderAll();}return;}
+      await togglePin(pin);
+    };
+    g.appendChild(b);
+  }
+  const add=el('button','pin add');
+  add.innerHTML='<div><div class="plus">+</div>Pin a task</div>';
+  add.onclick=()=>openPinModal();
+  g.appendChild(add);
+}
+async function togglePin(pin){
+  const run=entries.find(e=>!e.end&&sameTask(e,pin.category_id,pin.subcategory_id,pin.work_name));
+  if(run){run.end=nowMs();run.updated_at=nowMs();await put('entries',run);}
+  else await put('entries',{category_id:pin.category_id,subcategory_id:pin.subcategory_id||null,work_name:pin.work_name,start:nowMs(),end:null,note:'',created_at:nowMs(),updated_at:nowMs()});
+  await loadAll();renderAll();
+}
+function openPinModal(){
+  const catOpts=cats.filter(c=>!c.archived).map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  const html=`<h3>Pin a task</h3>
+    <label>Category</label><select id="pmCat">${catOpts}</select>
+    <label>Subcategory (optional)</label><select id="pmSub"><option value="">— none —</option></select>
+    <label>Work name</label><input id="pmWork" placeholder="e.g. Gym, Python, SQL">
+    <div class="row"><button class="btn ghost" id="pmCancel">Cancel</button><button class="btn primary" id="pmSave">Pin it</button></div>`;
+  const back=el('div','modal-back',`<div class="modal">${html}</div>`);
+  document.body.appendChild(back);
+  const fill=()=>{
+    const cid=Number(back.querySelector('#pmCat').value);
+    back.querySelector('#pmSub').innerHTML='<option value="">— none —</option>'+subs.filter(s=>s.category_id===cid&&!s.archived).map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  };
+  fill();
+  back.querySelector('#pmCat').onchange=fill;
+  back.querySelector('#pmCancel').onclick=()=>back.remove();
+  back.querySelector('#pmSave').onclick=async()=>{
+    const cid=Number(back.querySelector('#pmCat').value);
+    const sub=back.querySelector('#pmSub').value?Number(back.querySelector('#pmSub').value):null;
+    const work=back.querySelector('#pmWork').value.trim();
+    if(!work){alert('Enter a work name');return;}
+    const exists=pins.some(p=>p.category_id===cid&&(p.subcategory_id||null)===sub&&p.work_name===work);
+    if(exists){alert('Already pinned');return;}
+    await put('pins',{category_id:cid,subcategory_id:sub,work_name:work,sort:pins.length});
+    back.remove();await loadAll();renderAll();
+  };
+  back.onclick=e=>{if(e.target===back)back.remove();};
+}
+
+// ---------- running ----------
+function renderRunning(){
+  const box=$('#runningList');box.innerHTML='';
+  if(!running.length){box.appendChild(el('div','muted','Nothing running. Tap a pin above, or start manually.'));return;}
+  for(const e of running){
+    const c=catById(e.category_id)||{name:'?',color:'#888'};
+    const row=el('div','run-item');
+    row.id='run-'+e.id;
+    row.innerHTML=`
+      <div>
+        <div class="nm"><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:${c.color};margin-right:6px"></span>${e.work_name}</div>
+        <div class="meta">${c.name}${e.subcategory_id?' • '+((subById(e.subcategory_id)||{}).name||''):''} • since ${istTime(e.start)}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="el elapsed">${dispDur(durMin(e.start,nowMs()))}</div>
+        <button class="stop">Stop</button>
+      </div>`;
+    row.querySelector('.stop').onclick=async()=>{e.end=nowMs();e.updated_at=nowMs();await put('entries',e);await loadAll();renderAll();};
+    box.appendChild(row);
+  }
+}
 
 function startTicker(){
   if(tick)clearInterval(tick);
   tick=setInterval(()=>{
-    if(!running.length){return}
     running.forEach(e=>{
       const el=document.getElementById('run-'+e.id);
-      if(el){el.querySelector('.elapsed').textContent=fmtDur(durMin(e.start,nowMs()))}
+      if(el){const x=el.querySelector('.elapsed');if(x)x.textContent=dispDur(durMin(e.start,nowMs()));}
     });
-    updateTodayTotal();
+    // Live update of pin timers
+    if(running.length)pins.forEach(pin=>{});
+    if(running.length)renderPins();
+    updateTodayPill();
   },1000);
 }
-function updateTodayTotal(){
-  const key=istDateKey(nowMs());
-  let t=0;
-  for(const e of entries){
-    if(istDateKey(e.start)!==key)continue;
-    t+=durMin(e.start,e.end||nowMs());
-  }
-  $('#todayTotal').textContent='Today: '+dispDur(t);
-}
 
-// ---------- render ----------
-function renderAll(){
-  fillCats();
-  renderRunning();
-  renderEntries();
-  renderCategories();
-  renderSettings();
-  updateTodayTotal();
+// ---------- log ----------
+function bindLog(){
+  $('#eAdd').onclick=()=>{
+    if(!cats.length){alert('Create a category first');return;}
+    const c=cats.filter(x=>!x.archived)[0];
+    const e={category_id:c.id,subcategory_id:null,work_name:'(untitled)',start:nowMs(),end:nowMs(),note:'',created_at:nowMs(),updated_at:nowMs()};
+    openEntryModal(e,true);
+  };
 }
-function renderRunning(){
-  const box=$('#runningList');box.innerHTML='';
-  if(!running.length){box.appendChild(el('div','muted','No running timers.'));return}
-  for(const e of running){
-    const c=catById(e.category_id);
-    const row=el('div','entry running');
-    row.id='run-'+e.id;
-    const left=el('div');
-    left.innerHTML=`<div><span class="pill cat" style="background:${c?c.color:'#888'}">${c?c.name:'?'}</span>${e.subcategory_id?'<span class="pill">'+((subById(e.subcategory_id)||{}).name||'')+'</span>':''}<strong>${e.work_name}</strong></div>
-      <div class="meta">Started ${istTime(e.start)} IST</div>`;
-    const right=el('div');
-    right.style.textAlign='right';
-    right.innerHTML=`<div class="elapsed" style="font-size:18px;font-weight:700">${fmtDur(durMin(e.start,nowMs()))}</div>`;
-    const b=el('button','danger','Stop');
-    b.style.width='auto';b.style.marginTop='6px';b.style.padding='6px 10px';
-    b.onclick=async()=>{e.end=nowMs();e.updated_at=nowMs();await put('entries',e);await loadAll();renderAll()};
-    right.appendChild(b);
-    row.appendChild(left);row.appendChild(right);
-    box.appendChild(row);
-  }
-}
-function renderEntries(){
+function renderLog(){
   const box=$('#entriesList');box.innerHTML='';
   const byDay={};
   for(const e of entries){
@@ -368,183 +665,264 @@ function renderEntries(){
     (byDay[k]=byDay[k]||[]).push(e);
   }
   const days=Object.keys(byDay).sort().reverse();
-  if(!days.length){box.appendChild(el('div','card muted','No entries yet.'));return}
+  if(!days.length){box.appendChild(el('div','card muted','No entries yet. Start a timer or add a missed entry.'));return;}
   for(const d of days){
     const card=el('div','card');
-    const tot=byDay[d].reduce((s,e)=>s+durMin(e.start,e.end||nowMs()),0);
-    card.appendChild(el('div','muted',`${d} &nbsp; • &nbsp; total ${dispDur(tot)}`));
-    for(const e of byDay[d]){
-      const c=catById(e.category_id);
-      const row=el('div','entry');
-      const left=el('div');
-      left.innerHTML=`<div><span class="pill cat" style="background:${c?c.color:'#888'}">${c?c.name:'?'}</span>${e.subcategory_id?'<span class="pill">'+((subById(e.subcategory_id)||{}).name||'')+'</span>':''}<strong>${e.work_name}</strong></div>
-        <div class="meta">${istTime(e.start)} → ${e.end?istTime(e.end):'running'} (${e.end?'':''}) &nbsp; ${dispDur(durMin(e.start,e.end||nowMs()))}</div>`;
-      const right=el('div');
-      right.style.display='flex';right.style.gap='4px';
-      const eb=el('button','ghost','Edit');eb.style.width='auto';eb.style.padding='4px 8px';eb.style.fontSize='12px';
-      eb.onclick=()=>editEntry(e);
-      const db=el('button','ghost','Del');db.style.width='auto';db.style.padding='4px 8px';db.style.fontSize='12px';db.style.color='var(--warn)';
-      db.onclick=async()=>{if(confirm('Delete this entry?')){await del('entries',e.id);await loadAll();renderAll()}};
-      right.appendChild(eb);right.appendChild(db);
-      row.appendChild(left);row.appendChild(right);
-      card.appendChild(row);
+    const dayEntries=byDay[d];
+    // group by task
+    const groups={};
+    for(const e of dayEntries){
+      const key=e.category_id+'|'+(e.subcategory_id||'')+'|'+e.work_name;
+      (groups[key]=groups[key]||[]).push(e);
+    }
+    let dayTotal=0;
+    for(const e of dayEntries)dayTotal+=durMin(e.start,e.end||nowMs());
+    const head=el('div','day-head');
+    const dObj=istMidnight(d);
+    head.innerHTML=`<div class="d">${istWeekday(dObj)} • ${istDateShort(dObj)}</div><div class="t">${dispDur(dayTotal)}</div>`;
+    card.appendChild(head);
+
+    const keys=Object.keys(groups).sort((a,b)=>{
+      const sa=groups[a].reduce((s,e)=>s+durMin(e.start,e.end||nowMs()),0);
+      const sb=groups[b].reduce((s,e)=>s+durMin(e.start,e.end||nowMs()),0);
+      return sb-sa;
+    });
+    for(const k of keys){
+      const arr=groups[k].slice().sort((a,b)=>a.start-b.start);
+      const c=catById(arr[0].category_id)||{name:'?',color:'#888'};
+      const s=arr[0].subcategory_id?subById(arr[0].subcategory_id):null;
+      const tot=arr.reduce((sum,e)=>sum+durMin(e.start,e.end||nowMs()),0);
+      const grp=el('div','task-group');
+      const th=el('div','th');
+      th.innerHTML=`<div class="tn"><span class="dot" style="background:${c.color}"></span><span class="tt2">${arr[0].work_name}${s?' <span class="muted">('+s.name+')</span>':''}</span></div><div class="t">${dispDur(tot)}</div>`;
+      grp.appendChild(th);
+      for(const e of arr){
+        const row=el('div','sess');
+        row.innerHTML=`<div class="st">${istTime(e.start)} → ${e.end?istTime(e.end):'running'}</div>
+          <div class="sd">${dispDur(durMin(e.start,e.end||nowMs()))}</div>
+          <button class="sx">Edit</button>`;
+        row.querySelector('.sx').onclick=()=>openEntryModal(e,false);
+        grp.appendChild(row);
+      }
+      card.appendChild(grp);
     }
     box.appendChild(card);
   }
 }
-function editEntry(e){
-  const c=catById(e.category_id);
-  const opts=cats.map(x=>`<option value="${x.id}" ${x.id===e.category_id?'selected':''}>${x.name}</option>`).join('');
-  const subOpts='<option value="">— none —</option>'+subs.filter(s=>s.category_id===e.category_id).map(s=>`<option value="${s.id}" ${s.id===e.subcategory_id?'selected':''}>${s.name}</option>`).join('');
-  const startL=istLocalInput(e.start);
-  const endL=e.end?istLocalInput(e.end):'';
-  const html=`<label>Category</label><select id="eeCat">${opts}</select>
-    <label>Subcategory</label><select id="eeSub">${subOpts}</select>
-    <label>Work name</label><input id="eeWork" value="${(e.work_name||'').replace(/"/g,'&quot;')}">
-    <label>Start (IST)</label><input id="eeStart" type="datetime-local" value="${startL}">
-    <label>End (IST, leave blank if running)</label><input id="eeEnd" type="datetime-local" value="${endL}">
-    <label>Note</label><input id="eeNote" value="${(e.note||'').replace(/"/g,'&quot;')}">
-    <div style="height:10px"></div>
-    <div class="row"><button class="primary" id="eeSave">Save</button><button class="ghost" id="eeCancel">Cancel</button></div>`;
-  const card=el('div','card',html);
-  card.style.borderColor='var(--acc)';
-  const box=$('#entriesList');
-  box.insertBefore(card,box.firstChild);
-  card.scrollIntoView({behavior:'smooth',block:'start'});
-  card.querySelector('#eeCat').onchange=()=>{
-    const cid=Number(card.querySelector('#eeCat').value);
-    card.querySelector('#eeSub').innerHTML='<option value="">— none —</option>'+subs.filter(s=>s.category_id===cid).map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+
+function openEntryModal(entry,isNew){
+  const catOpts=cats.filter(c=>!c.archived).map(c=>`<option value="${c.id}" ${c.id===entry.category_id?'selected':''}>${c.name}</option>`).join('');
+  const subOpts='<option value="">— none —</option>'+subs.filter(s=>s.category_id===entry.category_id&&!s.archived).map(s=>`<option value="${s.id}" ${s.id===entry.subcategory_id?'selected':''}>${s.name}</option>`).join('');
+  const startL=istLocalInput(entry.start);
+  const endL=entry.end?istLocalInput(entry.end):'';
+  const html=`<h3>${isNew?'Add entry':'Edit entry'}</h3>
+    <label>Category</label><select id="emCat">${catOpts}</select>
+    <label>Subcategory (optional)</label><select id="emSub">${subOpts}</select>
+    <label>Work name</label><input id="emWork" value="${(entry.work_name||'').replace(/"/g,'&quot;')}">
+    <label>Start (IST)</label><input id="emStart" type="datetime-local" value="${startL}">
+    <label>End (IST, leave blank if running)</label><input id="emEnd" type="datetime-local" value="${endL}">
+    <label>Note</label><input id="emNote" value="${(entry.note||'').replace(/"/g,'&quot;')}">
+    <div class="row"><button class="btn ghost" id="emCancel">Cancel</button>${isNew?'':'<button class="btn danger" id="emDel">Delete</button>'}<button class="btn primary" id="emSave">Save</button></div>`;
+  const back=el('div','modal-back',`<div class="modal">${html}</div>`);
+  document.body.appendChild(back);
+  const fill=()=>{
+    const cid=Number(back.querySelector('#emCat').value);
+    const cur=back.querySelector('#emSub').value;
+    back.querySelector('#emSub').innerHTML='<option value="">— none —</option>'+subs.filter(s=>s.category_id===cid&&!s.archived).map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+    if(cur)back.querySelector('#emSub').value=cur;
   };
-  card.querySelector('#eeCancel').onclick=()=>card.remove();
-  card.querySelector('#eeSave').onclick=async()=>{
-    const cid=Number(card.querySelector('#eeCat').value);
-    const sub=card.querySelector('#eeSub').value?Number(card.querySelector('#eeSub').value):null;
-    const work=card.querySelector('#eeWork').value.trim()||'(untitled)';
-    const sMs=istLocalToMs(card.querySelector('#eeStart').value);
-    const eMs=card.querySelector('#eeEnd').value?istLocalToMs(card.querySelector('#eeEnd').value):null;
-    if(!sMs){alert('Invalid start');return}
-    if(eMs!=null&&eMs<sMs){alert('End before start');return}
-    Object.assign(e,{category_id:cid,subcategory_id:sub,work_name:work,start:sMs,end:eMs,note:card.querySelector('#eeNote').value.trim(),updated_at:nowMs()});
-    await put('entries',e);await loadAll();renderAll();
+  back.querySelector('#emCat').onchange=fill;
+  back.querySelector('#emCancel').onclick=()=>back.remove();
+  if(!isNew)back.querySelector('#emDel').onclick=async()=>{if(confirm('Delete this entry?')){await del('entries',entry.id);back.remove();await loadAll();renderAll();}};
+  back.querySelector('#emSave').onclick=async()=>{
+    const cid=Number(back.querySelector('#emCat').value);
+    const sub=back.querySelector('#emSub').value?Number(back.querySelector('#emSub').value):null;
+    const work=back.querySelector('#emWork').value.trim()||'(untitled)';
+    const sMs=istLocalToMs(back.querySelector('#emStart').value);
+    const eMs=back.querySelector('#emEnd').value?istLocalToMs(back.querySelector('#emEnd').value):null;
+    if(!sMs){alert('Invalid start');return;}
+    if(eMs!=null&&eMs<sMs){alert('End before start');return;}
+    if(isNew){
+      await put('entries',{category_id:cid,subcategory_id:sub,work_name:work,start:sMs,end:eMs,note:back.querySelector('#emNote').value.trim(),created_at:nowMs(),updated_at:nowMs()});
+    }else{
+      Object.assign(entry,{category_id:cid,subcategory_id:sub,work_name:work,start:sMs,end:eMs,note:back.querySelector('#emNote').value.trim(),updated_at:nowMs()});
+      await put('entries',entry);
+    }
+    back.remove();await loadAll();renderAll();
   };
-}
-// IST <-> datetime-local helpers
-function istLocalInput(ms){
-  // produce YYYY-MM-DDTHH:MM in IST
-  const p=new Intl.DateTimeFormat('en-CA',{timeZone:IST,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date(ms));
-  const g=k=>p.find(x=>x.type===k).value;
-  return `${g('year')}-${g('month')}-${g('day')}T${g('hour')}:${g('minute')}`;
-}
-function istLocalToMs(s){
-  if(!s)return null;
-  const m=s.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/);
-  if(!m)return null;
-  const [_,Y,M,D,h,mi]=m;
-  // IST is UTC+5:30, no DST
-  const utc=Date.UTC(+Y,+M-1,+D,+h,+mi)-5.5*3600000;
-  return utc;
+  back.onclick=e=>{if(e.target===back)back.remove();};
 }
 
-// ---------- entries toolbar ----------
-function bindEntries(){
-  $('#eAdd').onclick=()=>{
-    const c=cats[0];
-    if(!c){alert('Create a category first');return}
-    const e={category_id:c.id,subcategory_id:null,work_name:'(untitled)',start:nowMs(),end:nowMs(),note:'',created_at:nowMs(),updated_at:nowMs()};
-    editEntry(e);
-  };
-}
-
-// ---------- dashboard ----------
-let dRange='today',dFrom=null,dTo=null;
-function bindDashboard(){
+// ---------- compare ----------
+function bindCompare(){
   $('#dRange').onclick=e=>{
     if(e.target.tagName!=='BUTTON')return;
-    dRange=e.target.dataset.r;
-    $$('#dRange button').forEach(b=>b.classList.toggle('on',b.dataset.r===dRange));
-    $('#dCustom').classList.toggle('hidden',dRange!=='custom');
-    renderDashboard();
+    compareRange=Number(e.target.dataset.r);
+    $$('#dRange button').forEach(b=>b.classList.toggle('on',b===e.target));
+    renderCompare();
   };
-  $('#dFrom').onchange=()=>{dFrom=$('#dFrom').value;renderDashboard()};
-  $('#dTo').onchange=()=>{dTo=$('#dTo').value;renderDashboard()};
 }
-function rangeBounds(){
-  const now=nowMs();
-  if(dRange==='today'){
-    const k=istDateKey(now);
-    return [istLocalToMs(k+'T00:00'),istLocalToMs(k+'T23:59')+59999];
+
+function renderCompare(){
+  const days=lastNDays(compareRange);
+  const fromMs=istMidnight(days[0]);
+  const toMs=nowMs();
+  const todayKey=istDateKey(toMs);
+  const yKey=istDateKey(toMs-86400000);
+
+  // Collect tasks present in range + pins
+  const taskMap=new Map();
+  const tk=(c,s,w)=>c+'|'+(s||'')+'|'+w;
+  for(const p of pins){
+    taskMap.set(tk(p.category_id,p.subcategory_id,p.work_name),{c:p.category_id,s:p.subcategory_id||null,w:p.work_name});
   }
-  if(dRange==='7')return [now-7*86400000,now];
-  if(dRange==='30')return [now-30*86400000,now];
-  if(dRange==='custom'){
-    if(!dFrom||!dTo)return [now-7*86400000,now];
-    return [istLocalToMs(dFrom+'T00:00'),istLocalToMs(dTo+'T23:59')+59999];
-  }
-  return [now-86400000,now];
-}
-function renderDashboard(){
-  const [from,to]=rangeBounds();
-  const list=entries.filter(e=>{
-    const s=e.start;
+  for(const e of entries){
     const en=e.end||nowMs();
-    return s<=to && en>=from;
-  });
-  let total=0;
-  const byCat={},byWork={};
-  const byDay={};
-  for(const e of list){
-    const s=Math.max(e.start,from);
-    const en=Math.min(e.end||nowMs(),to);
-    if(en<=s)continue;
-    const m=durMin(s,en);
-    total+=m;
-    byCat[e.category_id]=(byCat[e.category_id]||0)+m;
-    const wk=(catById(e.category_id)||{}).name+' — '+e.work_name;
-    byWork[wk]=(byWork[wk]||0)+m;
-    const dk=istDateKey(s);
-    byDay[dk]=(byDay[dk]||0)+m;
+    if(en<fromMs||e.start>toMs)continue;
+    taskMap.set(tk(e.category_id,e.subcategory_id,e.work_name),{c:e.category_id,s:e.subcategory_id||null,w:e.work_name});
   }
-  $('#dTotal').textContent=dispDur(total);
-  // chart
-  const days=Object.keys(byDay).sort();
-  drawChart(days.map(d=>byDay[d]));
-  // by cat
+
+  // Compute matrix
+  const dayStart=days.map(d=>istMidnight(d));
+  const dayEnd=days.map((d,i)=>dayStart[i]+86400000-1);
+  const rows=[];
+  for(const {c,s,w} of taskMap.values()){
+    const per={};
+    let total=0;
+    for(let i=0;i<days.length;i++){
+      let sum=0;
+      for(const e of entries){
+        if(e.category_id!==c)continue;
+        if((e.subcategory_id||null)!==(s||null))continue;
+        if(e.work_name!==w)continue;
+        const st=Math.max(e.start,dayStart[i]);
+        const en=Math.min(e.end||nowMs(),dayEnd[i]);
+        if(en>st)sum+=durMin(st,en);
+      }
+      per[days[i]]=sum;
+      total+=sum;
+    }
+    rows.push({c,s,w,per,total});
+  }
+  rows.sort((a,b)=>b.total-a.total);
+
+  // Grand total
+  let grand=0;
+  const colTotals={};
+  for(const d of days)colTotals[d]=0;
+  for(const r of rows){
+    grand+=r.total;
+    for(const d of days)colTotals[d]+=r.per[d];
+  }
+  $('#dTotal').textContent=dispDur(grand);
+
+  // Chart: total per day
+  drawChart(days.map(d=>colTotals[d]));
+
+  // Pivot
+  const wrap=$('#pivotWrap');
+  wrap.innerHTML='';
+  if(!rows.length){
+    wrap.appendChild(el('div','muted','No data in this range yet.'));
+  } else {
+    const tbl=el('table','pivot');
+    const thead=el('thead');
+    const trh=el('tr');
+    trh.appendChild(el('th','tk','Task'));
+    for(const d of days){
+      const th=el('th',(d===todayKey?'today':''),'');
+      const dObj=istMidnight(d);
+      th.innerHTML=istWeekday(dObj)+'<br>'+istDateShort(dObj).split(' ')[0];
+      trh.appendChild(th);
+    }
+    trh.appendChild(el('th','tot','Total'));
+    thead.appendChild(trh);tbl.appendChild(thead);
+
+    const tb=el('tbody');
+    for(const r of rows){
+      const tr=el('tr');
+      const c=catById(r.c)||{name:'?',color:'#888'};
+      const s=r.s?subById(r.s):null;
+      const tk=el('td','tk');
+      tk.innerHTML=`<span class="dot" style="background:${c.color}"></span>${r.w}${s?' <span class="sub">'+s.name+'</span>':''}`;
+      tr.appendChild(tk);
+      for(const d of days){
+        const v=r.per[d];
+        const td=el('td',(d===todayKey?'today ':'')+(v?'':'zero'),v?dispDur(v):'·');
+        tr.appendChild(td);
+      }
+      tr.appendChild(el('td','tot',dispDur(r.total)));
+      tb.appendChild(tr);
+    }
+    // totals row
+    const trT=el('tr');
+    const td0=el('td','tk','Total');
+    td0.style.fontWeight='700';trT.appendChild(td0);
+    for(const d of days){
+      const td=el('td',(d===todayKey?'today':''),colTotals[d]?dispDur(colTotals[d]):'·');
+      td.style.fontWeight='700';
+      trT.appendChild(td);
+    }
+    trT.appendChild(el('td','tot',dispDur(grand)));
+    tb.appendChild(trT);
+    tbl.appendChild(tb);
+    wrap.appendChild(tbl);
+  }
+
+  // By category
+  const byCat={};
+  for(const r of rows){
+    byCat[r.c]=(byCat[r.c]||0)+r.total;
+  }
   const catBox=$('#dByCat');catBox.innerHTML='';
-  const catArr=Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
-  for(const [cid,m] of catArr){
-    const c=catById(Number(cid));
-    const row=el('div','entry');
-    row.innerHTML=`<div><span class="pill cat" style="background:${c?c.color:'#888'}">${c?c.name:'?'}</span></div><div>${dispDur(m)}</div>`;
+  const arr=Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+  if(!arr.length)catBox.appendChild(el('div','muted','No data.'));
+  for(const [cid,v] of arr){
+    const c=catById(Number(cid))||{name:'?',color:'#888'};
+    const row=el('div','cat-tot');
+    row.innerHTML=`<div class="nm"><span class="sw" style="background:${c.color}"></span>${c.name}</div><div class="v">${dispDur(v)}</div>`;
     catBox.appendChild(row);
-  }
-  // by work
-  const workBox=$('#dByWork');workBox.innerHTML='';
-  const workArr=Object.entries(byWork).sort((a,b)=>b[1]-a[1]);
-  for(const [w,m] of workArr){
-    const row=el('div','entry');
-    row.innerHTML=`<div>${w}</div><div>${dispDur(m)}</div>`;
-    workBox.appendChild(row);
   }
 }
 function drawChart(values){
   const cv=$('#dChart');
   const dpr=window.devicePixelRatio||1;
-  const w=cv.clientWidth||320,h=cv.clientHeight||180;
+  const w=cv.clientWidth||320,h=cv.clientHeight||150;
   cv.width=w*dpr;cv.height=h*dpr;
-  const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
+  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.clearRect(0,0,w,h);
-  if(!values.length)return;
+  if(!values.length||Math.max(...values)===0){
+    ctx.fillStyle='#3b444d';ctx.font='12px system-ui';ctx.textAlign='center';
+    ctx.fillText('No data yet',w/2,h/2);
+    return;
+  }
   const max=Math.max(1,...values);
-  const pad=20,bw=(w-pad*2)/values.length;
-  ctx.fillStyle='#8b98a5';ctx.font='10px system-ui';
+  const padX=12,padT=20,padB=10;
+  const innerW=w-padX*2,innerH=h-padT-padB;
+  const bw=innerW/values.length;
   values.forEach((v,i)=>{
-    const bh=(h-pad*2)*(v/max);
-    const x=pad+i*bw+bw*0.15;
-    const y=h-pad-bh;
-    ctx.fillStyle='#4ade80';
-    ctx.fillRect(x,y,bw*0.7,bh);
+    const bh=(innerH)*(v/max);
+    const x=padX+i*bw+bw*0.18;
+    const y=padT+innerH-bh;
+    const grad=ctx.createLinearGradient(0,y,0,y+bh);
+    grad.addColorStop(0,'#4ade80');grad.addColorStop(1,'rgba(74,222,128,.35)');
+    ctx.fillStyle=grad;
+    const r=Math.min(6,bw*0.35);
+    roundRect(ctx,x,y,bw*0.64,bh,r);ctx.fill();
   });
-  ctx.strokeStyle='#232b32';ctx.beginPath();ctx.moveTo(pad,h-pad);ctx.lineTo(w-pad,h-pad);ctx.stroke();
+  ctx.strokeStyle='#232b33';ctx.beginPath();
+  ctx.moveTo(padX,h-padB);ctx.lineTo(w-padX,h-padB);ctx.stroke();
+}
+function roundRect(ctx,x,y,w,h,r){
+  if(h<r*2)r=h/2;
+  if(w<r*2)r=w/2;
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
 }
 
 // ---------- categories ----------
@@ -560,34 +938,47 @@ function bindCategories(){
 function renderCategories(){
   const box=$('#catList');box.innerHTML='';
   const active=cats.filter(c=>!c.archived);
-  if(!active.length){box.appendChild(el('div','muted','No categories.'));return}
+  if(!active.length){box.appendChild(el('div','muted','No categories.'));return;}
   for(const c of active){
-    const row=el('div','cat-row');
-    const sw=el('div','swatch');sw.style.background=c.color;
-    const name=el('div','',c.name);name.style.flex='1';
-    const subBtn=el('button','ghost','+ sub');subBtn.style.width='auto';subBtn.style.padding='4px 8px';subBtn.style.fontSize='12px';
-    subBtn.onclick=()=>{
-      const n=prompt('Subcategory name under "'+c.name+'"');
+    const row=el('div','cat-item');
+    row.innerHTML=`
+      <span style="width:12px;height:12px;border-radius:4px;background:${c.color};flex:0 0 auto"></span>
+      <span class="nm">${c.name}</span>
+      <button class="icon-btn" data-a="sub" title="Add subcategory">+ sub</button>
+      <button class="icon-btn" data-a="ren" title="Rename">✎</button>
+      <button class="icon-btn" data-a="arc" title="Archive" style="color:var(--warn)">×</button>`;
+    row.querySelector('[data-a="sub"]').onclick=async()=>{
+      const n=prompt('Subcategory under "'+c.name+'"');
       if(!n)return;
-      put('subcategories',{category_id:c.id,name:n.trim(),sort:0,archived:false}).then(async()=>{subs=await getAll('subcategories');renderAll()});
+      await put('subcategories',{category_id:c.id,name:n.trim(),sort:0,archived:false});
+      subs=await getAll('subcategories');renderAll();
     };
-    const ren=el('button','ghost','Rename');ren.style.width='auto';ren.style.padding='4px 8px';ren.style.fontSize='12px';
-    ren.onclick=async()=>{
+    row.querySelector('[data-a="ren"]').onclick=async()=>{
       const n=prompt('New name',c.name);
       if(!n)return;
       c.name=n.trim();await put('categories',c);cats=await getAll('categories');renderAll();
     };
-    const rm=el('button','ghost','Archive');rm.style.width='auto';rm.style.padding='4px 8px';rm.style.fontSize='12px';rm.style.color='var(--warn)';
-    rm.onclick=async()=>{if(confirm('Archive "'+c.name+'"?')){c.archived=true;await put('categories',c);cats=await getAll('categories');renderAll()}};
-    row.appendChild(sw);row.appendChild(name);row.appendChild(subBtn);row.appendChild(ren);row.appendChild(rm);
+    row.querySelector('[data-a="arc"]').onclick=async()=>{
+      if(!confirm('Archive "'+c.name+'"?'))return;
+      c.archived=true;await put('categories',c);cats=await getAll('categories');renderAll();
+    };
     box.appendChild(row);
+
     const mySubs=subs.filter(s=>s.category_id===c.id&&!s.archived);
     for(const s of mySubs){
-      const sr=el('div','cat-row sub');
-      const sn=el('div','',s.name);sn.style.flex='1';
-      const sx=el('button','ghost','×');sx.style.width='auto';sx.style.padding='2px 8px';sx.style.color='var(--warn)';
-      sx.onclick=async()=>{if(confirm('Remove subcategory "'+s.name+'"?')){s.archived=true;await put('subcategories',s);subs=await getAll('subcategories');renderAll()}};
-      sr.appendChild(sn);sr.appendChild(sx);
+      const sr=el('div','sub-item');
+      sr.innerHTML=`<span style="flex:1">${s.name}</span>
+        <button class="icon-btn" data-a="sren">✎</button>
+        <button class="icon-btn" data-a="sarc" style="color:var(--warn)">×</button>`;
+      sr.querySelector('[data-a="sren"]').onclick=async()=>{
+        const n=prompt('New subcategory name',s.name);
+        if(!n)return;
+        s.name=n.trim();await put('subcategories',s);subs=await getAll('subcategories');renderAll();
+      };
+      sr.querySelector('[data-a="sarc"]').onclick=async()=>{
+        if(!confirm('Archive "'+s.name+'"?'))return;
+        s.archived=true;await put('subcategories',s);subs=await getAll('subcategories');renderAll();
+      };
       box.appendChild(sr);
     }
   }
@@ -595,48 +986,63 @@ function renderCategories(){
 
 // ---------- settings ----------
 function bindSettings(){
-  $('#sDisp').onchange=async()=>{settings.disp=$('#sDisp').value;await saveSettings();renderAll()};
-  $('#sRet').onchange=async()=>{settings.ret=Number($('#sRet').value);await saveSettings();await cleanup();renderAll()};
-  $('#xRange').onclick=e=>{
-    if(e.target.tagName!=='BUTTON')return;
-    $$('#xRange button').forEach(b=>b.classList.toggle('on',b===e.target));
-    $('#xCustom').classList.toggle('hidden',e.target.dataset.r!=='custom');
-  };
+  $('#sDisp').onchange=async()=>{settings.disp=$('#sDisp').value;await saveSettings();renderAll();renderCompare();};
+  $('#sRet').onchange=async()=>{settings.ret=Number($('#sRet').value);await saveSettings();await cleanup();renderAll();};
+  $$('#xRange button').forEach(b=>b.onclick=()=>{$$('#xRange button').forEach(x=>x.classList.remove('on'));b.classList.add('on');});
   $('#xCSV').onclick=()=>doExport('csv');
   $('#xJSON').onclick=()=>doExport('json');
+  $('#importFile').onchange=e=>{if(e.target.files[0])doImport(e.target.files[0]);e.target.value='';};
+  $('#customDel').onclick=async()=>{
+    const n=Number($('#customDays').value);
+    if(!n||n<1){alert('Enter a number of days');return;}
+    if(!confirm('Delete all entries older than '+n+' days?'))return;
+    const cutoff=nowMs()-n*86400000;
+    for(const e of entries){if(e.end&&e.end<cutoff)await del('entries',e.id);}
+    await loadAll();renderAll();renderCompare();
+    alert('Done.');
+  };
+  $('#wipeAll').onclick=async()=>{
+    if(!confirm('Delete ALL data? Categories, subcategories, pins, and entries. This cannot be undone.'))return;
+    if(!confirm('Are you absolutely sure? Export first if you need a backup.'))return;
+    await clearStore('entries');await clearStore('pins');
+    await clearStore('subcategories');await clearStore('categories');
+    await loadAll();await ensureDefaults();renderAll();renderCompare();
+    alert('All data deleted.');
+  };
 }
 function renderSettings(){
   $('#sDisp').value=settings.disp;
   $('#sRet').value=settings.ret;
 }
-function exportBounds(){
+
+// ---------- export / import ----------
+function exportRange(){
   const active=$$('#xRange button').find(b=>b.classList.contains('on'));
   const r=active?active.dataset.r:'7';
   const now=nowMs();
   if(r==='7')return [now-7*86400000,now];
-  if(r==='30')return [now-30*86400000,now];
-  if(r==='all')return [0,now];
-  const f=$('#xFrom').value,t=$('#xTo').value;
-  if(!f||!t)return [now-7*86400000,now];
-  return [istLocalToMs(f+'T00:00'),istLocalToMs(t+'T23:59')+59999];
+  if(r==='10')return [now-10*86400000,now];
+  return [0,now];
 }
 function doExport(kind){
-  const [from,to]=exportBounds();
+  const [from,to]=exportRange();
   const list=entries.filter(e=>e.start>=from&&e.start<=to).sort((a,b)=>a.start-b.start);
-  const rows=[['Category','Subcategory','Work','Start (IST)','End (IST)','Duration (min)','Duration HH:MM','Note']];
+  const rows=[['Category','Subcategory','Work','Start (IST)','End (IST)','Duration (min)','Duration (h m)','Note']];
   for(const e of list){
     const c=catById(e.category_id)||{};
     const s=subById(e.subcategory_id)||{};
     const end=e.end||nowMs();
     const m=durMin(e.start,end);
-    rows.push([c.name||'',s.name||'',e.work_name||'',istDate(e.start)+' '+istTime(e.start),e.end?istDate(e.end)+' '+istTime(e.end):'(running)',String(m),fmtDur(m),e.note||'']);
+    rows.push([c.name||'',s.name||'',e.work_name||'',istDateShort(e.start)+' '+istTime(e.start),e.end?istDateShort(e.end)+' '+istTime(e.end):'(running)',String(m),fmtDur(m),e.note||'']);
   }
   const stamp=istDateKey(nowMs());
   if(kind==='csv'){
     const csv=rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\r\n');
     download('timetrack-'+stamp+'.csv','text/csv',csv);
   }else{
-    const payload={exported_at:new Date().toISOString(),timezone:'Asia/Kolkata',from:new Date(from).toISOString(),to:new Date(to).toISOString(),categories:cats,subcategories:subs,entries:list};
+    const payload={exported_at:new Date().toISOString(),timezone:'Asia/Kolkata',
+      from:new Date(from).toISOString(),to:new Date(to).toISOString(),
+      categories:cats,subcategories:subs,pins:pins,entries:list};
     download('timetrack-'+stamp+'.json','application/json',JSON.stringify(payload,null,2));
   }
 }
@@ -644,11 +1050,71 @@ function download(name,mime,text){
   const blob=new Blob([text],{type:mime+';charset=utf-8'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download=name;a.click();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+async function doImport(file){
+  try{
+    const text=await file.text();
+    const data=JSON.parse(text);
+    // 1. Map by name to avoid ID clash
+    const catByName=new Map(cats.map(c=>[c.name,c.id]));
+    if(Array.isArray(data.categories)){
+      for(const c of data.categories){
+        if(!catByName.has(c.name)){
+          const id=await put('categories',{name:c.name,color:c.color||'#888',sort:c.sort||0,archived:!!c.archived});
+          catByName.set(c.name,id);
+        }
+      }
+    }
+    cats=await getAll('categories');
+    const catByName2=new Map(cats.map(c=>[c.name,c.id]));
+    const catByIdOld=new Map((data.categories||[]).map(c=>[c.id,c.name]));
+
+    const subByName=new Map(subs.map(s=>[s.category_id+'|'+s.name,s.id]));
+    if(Array.isArray(data.subcategories)){
+      for(const s of data.subcategories){
+        const oldCatName=catByIdOld.get(s.category_id);
+        const newCatId=catByName2.get(oldCatName);
+        if(!newCatId)continue;
+        const k=newCatId+'|'+s.name;
+        if(!subByName.has(k)){
+          const id=await put('subcategories',{category_id:newCatId,name:s.name,sort:s.sort||0,archived:!!s.archived});
+          subByName.set(k,id);
+        }
+      }
+    }
+    subs=await getAll('subcategories');
+    const subByName2=new Map(subs.map(s=>[s.category_id+'|'+s.name,s.id]));
+    const subByIdOld=new Map((data.subcategories||[]).map(s=>[s.id,s.name]));
+
+    // Import entries
+    let added=0;
+    if(Array.isArray(data.entries)){
+      const existing=new Set(entries.map(e=>e.category_id+'|'+(e.subcategory_id||'')+'|'+e.work_name+'|'+e.start));
+      for(const e of data.entries){
+        const cname=catByIdOld.get(e.category_id);
+        const cid=catByName2.get(cname);
+        if(!cid)continue;
+        let sid=null;
+        if(e.subcategory_id){
+          const sname=subByIdOld.get(e.subcategory_id);
+          sid=subByName2.get(cid+'|'+sname)||null;
+        }
+        const k=cid+'|'+(sid||'')+'|'+e.work_name+'|'+e.start;
+        if(existing.has(k))continue;
+        existing.add(k);
+        await put('entries',{category_id:cid,subcategory_id:sid,work_name:e.work_name,
+          start:e.start,end:e.end,note:e.note||'',created_at:e.created_at||nowMs(),updated_at:e.updated_at||nowMs()});
+        added++;
+      }
+    }
+    await loadAll();renderAll();renderCompare();
+    alert('Import complete. '+added+' new entries added.');
+  }catch(err){alert('Import failed: '+err.message);}
 }
 
 // ---------- go ----------
-init().catch(err=>{alert('Init failed: '+err.message);console.error(err)});
+init().catch(err=>{alert('Init failed: '+err.message);console.error(err);});
 </script>
 </body>
 </html>
