@@ -1,4 +1,4 @@
-const C='timetrack-v3';
+const C='timetrack-v4';
 const ASSETS=['./','./index.html','./manifest.json'];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(C).then(c=>c.addAll(ASSETS)));
