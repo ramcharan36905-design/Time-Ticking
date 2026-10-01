@@ -51,6 +51,13 @@ label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px;font-wei
 .pin .rm{position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.3);border:0;color:var(--muted);font-size:12px;line-height:1;display:grid;place-items:center;padding:0}
 .pin.add{background:transparent;border-style:dashed;text-align:center;display:grid;place-items:center;color:var(--muted);font-weight:600;font-size:12px}
 .pin.add .plus{font-size:22px;line-height:1;margin-bottom:4px;color:var(--acc)}
+.single-toggle{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surf);border:1px solid var(--line);border-radius:var(--r);margin-bottom:12px;cursor:pointer;user-select:none;transition:all .15s}
+.single-toggle input{width:auto;flex:0 0 auto;margin:0;transform:scale(1.3)}
+.single-toggle .txt{flex:1;min-width:0}
+.single-toggle .label{font-size:13px;font-weight:600;margin:0}
+.single-toggle .sub{font-size:11px;color:var(--muted);margin-top:3px}
+.single-toggle.on{border-color:var(--acc);background:rgba(74,222,128,.06)}
+.single-toggle.on .label{color:var(--acc)}
 .run-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
 .run-item:last-child{border-bottom:0}
 .run-item .nm{font-weight:600;font-size:13px}
@@ -67,15 +74,15 @@ label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px;font-wei
 .task-group .th .tn .dot{width:8px;height:8px;border-radius:3px;flex:0 0 auto}
 .task-group .th .tn .tt2{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .task-group .th .t{font-weight:700;color:var(--acc);font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
-.sess{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0 6px 12px;font-size:12px;color:var(--muted);border-left:2px solid var(--line);margin-left:7px;margin-top:4px}
+.sess{display:flex;align-items:center;gap:10px;padding:8px 0 8px 12px;font-size:12px;color:var(--muted);border-left:2px solid var(--line);margin-left:7px;margin-top:4px}
 .sess.split{border-left-color:var(--acc2)}
 .sess.running{border-left-color:var(--acc)}
-.sess .st{font-variant-numeric:tabular-nums}
-.sess .sd{color:var(--fg);font-variant-numeric:tabular-nums;font-weight:600}
-.sess .sx{background:transparent;border:0;color:var(--muted);font-size:12px;padding:2px 6px;width:auto;flex:0 0 auto}
+.sess .st{flex:0 0 180px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sess .sd{flex:0 0 60px;text-align:center;color:var(--fg);font-variant-numeric:tabular-nums;font-weight:600}
+.sess .sx{margin-left:auto;background:transparent;border:0;color:var(--muted);font-size:12px;padding:2px 6px;width:auto;flex:0 0 auto}
 .sess .tag{font-size:9px;color:var(--acc2);border:1px solid var(--acc2);border-radius:4px;padding:0 4px;margin-left:4px}
 .day-notes{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line)}
-.day-notes textarea{min-height:50px;font-size:13px;resize:vertical}
+.day-notes textarea{min-height:120px;font-size:13px;resize:vertical;line-height:1.5}
 .range-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
 .range-row label{margin:0;font-size:12px}
 .range-row input[type=number]{width:80px;text-align:center;font-weight:700;flex:0 0 auto}
@@ -93,6 +100,8 @@ table.pivot td.today{background:rgba(74,222,128,.06)}
 table.pivot td.tk,table.pivot th.tk{text-align:left;position:sticky;left:0;background:var(--surf2);z-index:1;min-width:140px;max-width:200px;overflow:hidden;text-overflow:ellipsis;border-right:1px solid var(--line);font-weight:600;color:var(--fg)}
 table.pivot th.tk{background:var(--surf);z-index:3}
 table.pivot td.tk{cursor:pointer}
+table.pivot td.tk .drag{display:inline-block;color:var(--muted);cursor:grab;font-size:12px;margin-right:6px;user-select:none;touch-action:none;letter-spacing:-2px}
+table.pivot td.tk .drag:active{cursor:grabbing}
 table.pivot tr.total-row td{background:var(--surf);font-weight:700;border-top:2px solid var(--line)}
 table.pivot td.tot,table.pivot th.tot{color:var(--acc);font-weight:700;border-left:1px solid var(--line);background:var(--surf)}
 table.pivot td.zero{color:#3b444d}
@@ -102,6 +111,8 @@ table.pivot .dot{display:inline-block;width:7px;height:7px;border-radius:2px;mar
 table.pivot .sub{font-size:10px;color:var(--muted);font-weight:400}
 table.pivot td.excl,table.pivot td.dim{opacity:.35;text-decoration:line-through}
 table.pivot td.tk.excl{opacity:.5;text-decoration:line-through}
+table.pivot tr.dragging{opacity:.35}
+table.pivot tr.dragover td{border-top:2px solid var(--acc)}
 .cat-tot{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
 .cat-tot:last-child{border-bottom:0}
 .cat-tot .nm{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px}
@@ -121,27 +132,18 @@ table.pivot td.tk.excl{opacity:.5;text-decoration:line-through}
 .modal h3{margin:0 0 14px;font-size:16px;font-weight:700}
 .modal h4{margin:14px 0 8px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
 .modal .row{margin-top:16px}
+.modal textarea{min-height:120px;line-height:1.5}
 .ws-item{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--surf2);border:1px solid var(--line);border-radius:10px;margin-bottom:8px;cursor:pointer;font-weight:600;font-size:14px}
 .ws-item.on{border-color:var(--acc);background:rgba(74,222,128,.06)}
 .ws-item .del{color:var(--warn);font-size:12px;font-weight:600;padding:4px 8px;background:transparent;border:0;border-radius:6px}
-
-.color-picker-btn{display:flex;align-items:center;gap:10px;background:var(--surf2);border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;width:auto;color:var(--fg);font-weight:600;font-size:13px;transition:border-color .15s}
-.color-picker-btn:hover{border-color:var(--acc)}
-.color-preview{width:22px;height:22px;border-radius:6px;flex:0 0 auto;border:1px solid rgba(255,255,255,.15)}
-.color-grid-wrap{margin-top:8px;background:var(--surf2);border:1px solid var(--line);border-radius:10px;padding:10px}
-.color-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
-.swatch{width:100%;aspect-ratio:1;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:transform .1s}
-.swatch:hover{transform:scale(1.08)}
-.swatch.sel{border-color:var(--fg);box-shadow:0 0 0 2px var(--acc)}
-
+.color-input{width:80px;height:44px;padding:3px;border:1px solid var(--line);border-radius:10px;background:var(--surf2);cursor:pointer}
 .session-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px}
 .session-row:last-child{border-bottom:0}
-.session-row .st{color:var(--muted);font-variant-numeric:tabular-nums;min-width:120px}
+.session-row .st{color:var(--muted);font-variant-numeric:tabular-nums;min-width:130px}
 .session-row .sd{color:var(--acc);font-weight:700;font-variant-numeric:tabular-nums;min-width:70px;text-align:right}
 .session-row .sn{flex:1;color:var(--fg);font-size:12px;line-height:1.4}
 .session-row .sn.empty{color:var(--muted);font-style:italic}
 .session-row .edit{background:transparent;border:0;color:var(--muted);font-size:11px;padding:2px 6px;width:auto;flex:0 0 auto}
-
 .filter-row{display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;font-size:13px}
 .filter-row input[type=checkbox]{width:auto;flex:0 0 auto}
 .filter-cat-head{display:flex;align-items:center;gap:6px;margin:12px 0 6px;font-weight:700;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
@@ -173,6 +175,14 @@ table.pivot td.tk.excl{opacity:.5;text-decoration:line-through}
 
 <main>
 <section id="s-timer" class="on">
+  <label class="single-toggle" id="singleToggleLbl">
+    <input type="checkbox" id="singleTaskMode">
+    <div class="txt">
+      <div class="label">Single-task mode</div>
+      <div class="sub">When ON: starting a new task stops the previous one. When OFF: multiple tasks can run at once.</div>
+    </div>
+  </label>
+
   <div class="card">
     <h2>Pinned tasks</h2>
     <div class="pins" id="pinsGrid"></div>
@@ -213,7 +223,7 @@ table.pivot td.tk.excl{opacity:.5;text-decoration:line-through}
     <h2>Day-by-day by task</h2>
     <div class="pivot-wrap" id="pivotWrap"></div>
     <div class="pivot-resize" id="pivotResize"><div class="grip"></div></div>
-    <p class="muted" style="margin-top:6px">Click a task name or a cell → sessions + notes. Use Filter to hide tasks.</p>
+    <p class="muted" style="margin-top:6px">Drag rows by the grip to reorder (persists). Click a task or cell → sessions + notes.</p>
   </div>
   <div class="card"><h2>By category</h2><div id="dByCat"></div></div>
 </section>
@@ -224,13 +234,7 @@ table.pivot td.tk.excl{opacity:.5;text-decoration:line-through}
     <label>Name</label>
     <input id="cName" placeholder="Category name">
     <label>Color</label>
-    <button class="color-picker-btn" id="cColorBtn">
-      <span class="color-preview" id="cColorPreview"></span>
-      <span>Choose color</span>
-    </button>
-    <div class="color-grid-wrap hidden" id="cColorWrap">
-      <div class="color-grid" id="cColorGrid"></div>
-    </div>
+    <input type="color" id="cColor" value="#4ade80" class="color-input">
     <div style="height:12px"></div>
     <button class="btn primary" id="cAdd">Add category</button>
   </div>
@@ -297,32 +301,18 @@ function colLetter(n){let s='';while(n>0){const r=(n-1)%26;s=String.fromCharCode
 function rnd(){return 'ws_'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);}
 function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);};}
 
-// 35 distinct mid-tone colors. One color per hue family. No light/dark pairs.
-// All chosen to be readable when used as text color on the dark background.
-const PALETTE=[
-  '#ef4444','#e8703c','#f59e0b','#eab308','#d4d416','#a3e635','#84cc16',
-  '#22c55e','#10b981','#14b8a6','#06b6d4','#0ea5e9','#3b82f6','#6366f1',
-  '#8b5cf6','#a855f7','#d946ef','#ec4899','#f43f5e','#f97316','#fb923c',
-  '#facc15','#a3e635','#4ade80','#2dd4bf','#22d3ee','#38bdf8','#60a5fa',
-  '#818cf8','#a78bfa','#c084fc','#e879f9','#f472b6','#fb7185','#a16207'
-];
-// Deduplicate just in case
-const UNIQUE_PALETTE=Array.from(new Set(PALETTE));
-
 let db=null;
 let wsId='personal';
 let workspaces=[];
 let cats=[],subs=[],entries=[],pins=[],running=[];
 let daynotes={};
 let settings={display:'hm'};
-let wsSettings={pivotHeight:null,hiddenTasks:[]};
+let wsSettings={pivotHeight:null,hiddenTasks:[],singleTaskMode:false,taskOrder:[]};
 let tick=null;
 let compareDays=7;
 let compareExclusions=new Set();
 let compareExcludedCells=new Set();
 let expandedCats=new Set();
-let newCatColor='#4ade80';
-let colorPickerOpen=false;
 
 function loadWorkspaces(){try{const a=JSON.parse(localStorage.getItem('tt_workspaces')||'null');return Array.isArray(a)?a:null;}catch{return null;}}
 function saveWorkspaces(l){localStorage.setItem('tt_workspaces',JSON.stringify(l));}
@@ -335,7 +325,6 @@ function ensureWorkspaces(){
   if(!workspaces.find(w=>w.id===cur)){cur=workspaces[0].id;setCurrentWsId(cur);}
   return cur;
 }
-
 function openDB(id){
   return new Promise((res,rej)=>{
     const req=indexedDB.open('timetrack_ws_'+id,1);
@@ -379,8 +368,9 @@ async function loadWsSettings(){
   try{
     const r=await p(tx('settings').get('ws'));
     if(r&&r.v){
-      wsSettings=Object.assign({pivotHeight:null,hiddenTasks:[]},r.v);
+      wsSettings=Object.assign({pivotHeight:null,hiddenTasks:[],singleTaskMode:false,taskOrder:[]},r.v);
       if(!Array.isArray(wsSettings.hiddenTasks))wsSettings.hiddenTasks=[];
+      if(!Array.isArray(wsSettings.taskOrder))wsSettings.taskOrder=[];
     }
   }catch(_){}
 }
@@ -478,6 +468,7 @@ function renderAll(){
   renderWorkspaceName();
   fillCatSelect();renderPins();renderRunning();renderLog();
   renderCategories();renderSettings();updateTodayPill();
+  updateSingleToggleUI();
   if($('#s-compare').classList.contains('on'))renderCompare();
 }
 function updateTodayPill(){
@@ -487,14 +478,37 @@ function updateTodayPill(){
   for(const e of entries)t+=sliceMinutes(e,dStart,dEnd);
   $('#todayPill').textContent='Today '+dispDur(t);
 }
+function updateSingleToggleUI(){
+  const cb=$('#singleTaskMode');
+  if(cb)cb.checked=!!wsSettings.singleTaskMode;
+  const lbl=$('#singleToggleLbl');
+  if(lbl)lbl.classList.toggle('on',!!wsSettings.singleTaskMode);
+}
+
+// Auto-stop all other running entries when single-task mode is on
+async function enforceSingleTask(exceptEntry){
+  if(!wsSettings.singleTaskMode)return;
+  const others=running.filter(e=>e.id!==(exceptEntry?exceptEntry.id:null));
+  for(const e of others){
+    e.end=nowMs();e.updated_at=nowMs();
+    await put('entries',e);
+  }
+  if(others.length)await refreshEntries();
+}
 
 function bindTimer(){
   $('#tCat').onchange=fillSubSelect;
+  $('#singleTaskMode').onchange=async ev=>{
+    wsSettings.singleTaskMode=ev.target.checked;
+    await saveWsSettings();
+    updateSingleToggleUI();
+  };
   $('#tStart').onclick=async()=>{
     const cid=Number($('#tCat').value);if(!cid){alert('Pick a category');return;}
     const sub=$('#tSub').value?Number($('#tSub').value):null;
     const work=$('#tWork').value.trim()||'(untitled)';
     const note=$('#tNote').value.trim();
+    await enforceSingleTask(null);
     await put('entries',{category_id:cid,subcategory_id:sub,work_name:work,start:nowMs(),end:null,note,created_at:nowMs(),updated_at:nowMs()});
     $('#tWork').value='';$('#tNote').value='';
     await refreshEntries();renderAll();
@@ -544,7 +558,10 @@ function renderPins(){
 async function togglePin(pin){
   const run=entries.find(e=>!e.end&&e.category_id===pin.category_id&&(e.subcategory_id||null)===(pin.subcategory_id||null)&&e.work_name===pin.work_name);
   if(run){run.end=nowMs();run.updated_at=nowMs();await put('entries',run);}
-  else await put('entries',{category_id:pin.category_id,subcategory_id:pin.subcategory_id||null,work_name:pin.work_name,start:nowMs(),end:null,note:'',created_at:nowMs(),updated_at:nowMs()});
+  else{
+    await enforceSingleTask(null);
+    await put('entries',{category_id:pin.category_id,subcategory_id:pin.subcategory_id||null,work_name:pin.work_name,start:nowMs(),end:null,note:'',created_at:nowMs(),updated_at:nowMs()});
+  }
   await refreshEntries();renderAll();
 }
 function openPinModal(){
@@ -593,11 +610,22 @@ function renderRunning(){
 function startTicker(){
   if(tick)clearInterval(tick);
   tick=setInterval(()=>{
+    // Update Timer tab running display
     if(running.length){
-      running.forEach(e=>{const row=document.getElementById('run-'+e.id);if(row){const x=row.querySelector('.elapsed');if(x)x.textContent=dispDur(durMin(e.start,nowMs()));}});
-      renderPins();
-      renderLog();
+      running.forEach(e=>{
+        const row=document.getElementById('run-'+e.id);
+        if(row){const x=row.querySelector('.elapsed');if(x)x.textContent=dispDur(durMin(e.start,nowMs()));}
+      });
     }
+    // Update running session duration text in Log (no full re-render)
+    document.querySelectorAll('.sess.running').forEach(row=>{
+      const ss=parseInt(row.dataset.sliceStart||'0');
+      if(!ss)return;
+      const durEl=row.querySelector('.sd');
+      if(durEl)durEl.textContent=dispDur(durMin(ss,nowMs()));
+    });
+    // Update pin timers
+    if(running.length)renderPins();
     updateTodayPill();
   },1000);
 }
@@ -665,8 +693,9 @@ function renderLog(){
       grp.appendChild(th);
       for(const s of arr){
         const isRunning=!s.entry.end;
-        const timeStr=isRunning?`${istTime(s.sliceStart)} →`:`${istTime(s.sliceStart)} → ${istTime(s.sliceEnd)}`;
+        const timeStr=isRunning?`${istTime(s.sliceStart)} → running`:`${istTime(s.sliceStart)} → ${istTime(s.sliceEnd)}`;
         const row=el('div','sess'+(s.split?' split':'')+(isRunning?' running':''));
+        row.dataset.sliceStart=String(s.sliceStart);
         row.innerHTML=`<div class="st">${timeStr}${s.split?'<span class="tag">split</span>':''}</div>
           <div class="sd">${dispDur(durMin(s.sliceStart,s.sliceEnd))}</div>
           <button class="sx">Edit</button>`;
@@ -681,12 +710,19 @@ function renderLog(){
     const save=debounce(async()=>{
       const v=ta.value;daynotes[d]=v;
       if(v.trim())await put('daynotes',{date:d,text:v});else await del('daynotes',d);
-    },500);
+    },200);
     ta.oninput=save;ta.onblur=save;
     notes.appendChild(ta);card.appendChild(notes);
     box.appendChild(card);
   }
 }
+
+// Flush day note textareas on tab hide
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){
+    document.querySelectorAll('.day-notes textarea').forEach(ta=>ta.blur());
+  }
+});
 
 function openEntryModal(entry,isNew){
   const catOpts=cats.map(c=>`<option value="${c.id}" ${c.id===entry.category_id?'selected':''}>${c.name}</option>`).join('');
@@ -700,7 +736,7 @@ function openEntryModal(entry,isNew){
     <label>Work name</label><input id="emWork" value="${(entry.work_name||'').replace(/"/g,'&quot;')}">
     <label>Start (IST)</label><input id="emStart" type="datetime-local" value="${startL}">
     <label>End (IST, blank if running)</label><input id="emEnd" type="datetime-local" value="${endL}">
-    <label>Note</label><textarea id="emNote" style="min-height:50px">${(entry.note||'').replace(/</g,'&lt;')}</textarea>
+    <label>Note</label><textarea id="emNote">${(entry.note||'').replace(/</g,'&lt;')}</textarea>
     <div class="row">${isNew?'':'<button class="btn danger" id="emDel">Delete</button>'}<button class="btn ghost" id="emCancel">Cancel</button><button class="btn primary" id="emSave">Save</button></div>`;
   back.appendChild(modal);document.body.appendChild(back);
   const catSel=modal.querySelector('#emCat');const subSel=modal.querySelector('#emSub');
@@ -782,9 +818,7 @@ function openFilterModal(){
     taskMap.set(taskKey(e.category_id,e.subcategory_id,e.work_name),{c:e.category_id,w:e.work_name,key:taskKey(e.category_id,e.subcategory_id,e.work_name)});
   }
   const byCat={};
-  for(const t of taskMap.values()){
-    (byCat[t.c]=byCat[t.c]||[]).push(t);
-  }
+  for(const t of taskMap.values()){(byCat[t.c]=byCat[t.c]||[]).push(t);}
   const hidden=new Set(wsSettings.hiddenTasks||[]);
   const back=el('div','modal-back');
   const modal=el('div','modal');
@@ -825,8 +859,7 @@ function openFilterModal(){
   modal.querySelector('#fltClose').onclick=async()=>{
     wsSettings.hiddenTasks=Array.from(hidden);
     await saveWsSettings();
-    back.remove();
-    renderCompare();
+    back.remove();renderCompare();
   };
   back.onclick=e=>{if(e.target===back)back.remove();};
 }
@@ -865,7 +898,14 @@ function renderCompare(){
 
   const hiddenSet=new Set(wsSettings.hiddenTasks||[]);
   const visibleRows=allRows.filter(r=>!hiddenSet.has(r.key));
-  visibleRows.sort((a,b)=>b.total-a.total);
+  const order=wsSettings.taskOrder||[];
+  visibleRows.sort((a,b)=>{
+    const ia=order.indexOf(a.key),ib=order.indexOf(b.key);
+    if(ia>=0&&ib>=0)return ia-ib;
+    if(ia>=0)return -1;
+    if(ib>=0)return 1;
+    return b.total-a.total;
+  });
 
   const colTotals={};for(const d of days)colTotals[d]=0;
   let grand=0;
@@ -888,7 +928,7 @@ function renderCompare(){
 function renderPivot(days,rows,colTotals,grand,todayKey){
   const wrap=$('#pivotWrap');wrap.innerHTML='';
   wrap.style.height=wsSettings.pivotHeight?wsSettings.pivotHeight+'px':'';
-  if(!rows.length){wrap.appendChild(el('div','muted','No data in this range yet. Use Filter to unhide tasks.'));return;}
+  if(!rows.length){wrap.appendChild(el('div','muted','No data in this range yet.'));return;}
   const tbl=el('table','pivot');
   const thead=el('thead');const trh=el('tr');
   trh.appendChild(el('th','tk','Task'));
@@ -910,8 +950,13 @@ function renderPivot(days,rows,colTotals,grand,todayKey){
     const taskExcl=compareExclusions.has(r.key);
     const tkCell=el('td','tk'+(taskExcl?' excl':''));
     tkCell.dataset.key=r.key;
-    tkCell.innerHTML=`<span class="dot" style="background:${c.color}"></span><span class="tt">${r.w}${s?' <span class="sub">'+s.name+'</span>':''}</span>`;
-    tkCell.onclick=()=>openTaskModal(r.key);
+    tkCell.innerHTML=`<span class="drag" title="Drag to reorder">⋮⋮</span><span class="dot" style="background:${c.color}"></span><span class="tt">${r.w}${s?' <span class="sub">'+s.name+'</span>':''}</span>`;
+    const dragHandle=tkCell.querySelector('.drag');
+    dragHandle.addEventListener('pointerdown',ev=>startRowDrag(ev,tr));
+    tkCell.onclick=ev=>{
+      if(ev.target.classList.contains('drag'))return;
+      openTaskModal(r.key);
+    };
     tr.appendChild(tkCell);
 
     for(const d of days){
@@ -924,11 +969,8 @@ function renderPivot(days,rows,colTotals,grand,todayKey){
       if(taskExcl)td.classList.add('dim');
       if(cellExcl)td.classList.add('excl');
       td.textContent=v?dispDur(v):'·';
-      if(v){
-        td.onclick=()=>openCellModal(r.key,d);
-      }else{
-        td.onclick=()=>{if(cellExcl)compareExcludedCells.delete(ck);else compareExcludedCells.add(ck);renderCompare();};
-      }
+      if(v)td.onclick=()=>openCellModal(r.key,d);
+      else td.onclick=()=>{if(cellExcl)compareExcludedCells.delete(ck);else compareExcludedCells.add(ck);renderCompare();};
       tr.appendChild(td);
     }
     let rowTotal=0;
@@ -950,6 +992,57 @@ function renderPivot(days,rows,colTotals,grand,todayKey){
   trT.appendChild(el('td','tot',dispDur(grand)));
   tb.appendChild(trT);
   tbl.appendChild(tb);wrap.appendChild(tbl);
+}
+
+// ----- Drag-drop reorder (pointer events: mouse + touch) -----
+let dragState=null;
+function startRowDrag(ev,tr){
+  ev.preventDefault();
+  const tbody=tr.parentNode;
+  const rows=[...tbody.querySelectorAll('tr')].filter(r=>r.dataset.key);
+  const keys=rows.map(r=>r.dataset.key);
+  const idx=keys.indexOf(tr.dataset.key);
+  if(idx<0)return;
+  dragState={fromIdx:idx,currentIdx:idx,tr,tbody,rows};
+  tr.classList.add('dragging');
+  document.addEventListener('pointermove',onRowDragMove);
+  document.addEventListener('pointerup',onRowDragEnd);
+  document.addEventListener('pointercancel',onRowDragEnd);
+}
+function onRowDragMove(ev){
+  if(!dragState)return;
+  const y=ev.clientY;
+  const rows=dragState.rows;
+  for(let i=0;i<rows.length;i++){
+    const rect=rows[i].getBoundingClientRect();
+    if(y>=rect.top&&y<=rect.bottom){
+      if(dragState.currentIdx!==i){
+        rows.forEach(x=>x.classList.remove('dragover'));
+        rows[i].classList.add('dragover');
+        dragState.currentIdx=i;
+      }
+      return;
+    }
+  }
+}
+async function onRowDragEnd(){
+  document.removeEventListener('pointermove',onRowDragMove);
+  document.removeEventListener('pointerup',onRowDragEnd);
+  document.removeEventListener('pointercancel',onRowDragEnd);
+  if(!dragState)return;
+  const {fromIdx,currentIdx,rows,tr}=dragState;
+  rows.forEach(x=>x.classList.remove('dragover'));
+  tr.classList.remove('dragging');
+  dragState=null;
+  if(fromIdx===currentIdx)return;
+  const keys=rows.map(r=>r.dataset.key);
+  const [moved]=keys.splice(fromIdx,1);
+  keys.splice(currentIdx,0,moved);
+  const prev=wsSettings.taskOrder||[];
+  const extras=prev.filter(k=>!keys.includes(k));
+  wsSettings.taskOrder=[...keys,...extras];
+  await saveWsSettings();
+  renderCompare();
 }
 
 function renderByCat(rows){
@@ -1169,30 +1262,10 @@ function extractMinutes(txt){
 }
 
 function bindCategories(){
-  const grid=$('#cColorGrid');
-  grid.innerHTML='';
-  UNIQUE_PALETTE.forEach((col,i)=>{
-    const s=el('div','swatch'+(col===newCatColor?' sel':''));
-    s.style.background=col;
-    s.onclick=()=>{
-      newCatColor=col;
-      grid.querySelectorAll('.swatch').forEach(x=>x.classList.remove('sel'));
-      s.classList.add('sel');
-      $('#cColorPreview').style.background=col;
-      // Close picker after selection
-      $('#cColorWrap').classList.add('hidden');
-      colorPickerOpen=false;
-    };
-    grid.appendChild(s);
-  });
-  $('#cColorPreview').style.background=newCatColor;
-  $('#cColorBtn').onclick=()=>{
-    colorPickerOpen=!colorPickerOpen;
-    $('#cColorWrap').classList.toggle('hidden',!colorPickerOpen);
-  };
   $('#cAdd').onclick=async()=>{
     const n=$('#cName').value.trim();if(!n)return;
-    await put('categories',{name:n,color:newCatColor,sort:cats.length});
+    const color=$('#cColor').value||'#4ade80';
+    await put('categories',{name:n,color,sort:cats.length});
     $('#cName').value='';cats=await getAll('categories');renderAll();
   };
 }
