@@ -69,6 +69,7 @@ label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px;font-wei
 .task-group .th .t{font-weight:700;color:var(--acc);font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
 .sess{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0 6px 12px;font-size:12px;color:var(--muted);border-left:2px solid var(--line);margin-left:7px;margin-top:4px}
 .sess.split{border-left-color:var(--acc2)}
+.sess.running{border-left-color:var(--acc)}
 .sess .st{font-variant-numeric:tabular-nums}
 .sess .sd{color:var(--fg);font-variant-numeric:tabular-nums;font-weight:600}
 .sess .sx{background:transparent;border:0;color:var(--muted);font-size:12px;padding:2px 6px;width:auto;flex:0 0 auto}
@@ -78,16 +79,6 @@ label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px;font-wei
 .range-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
 .range-row label{margin:0;font-size:12px}
 .range-row input[type=number]{width:80px;text-align:center;font-weight:700;flex:0 0 auto}
-.routine-toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer;background:var(--surf2);border:1px solid var(--line);padding:6px 10px;border-radius:999px;user-select:none}
-.routine-toggle input{width:auto;margin:0}
-.routine-toggle.on{color:var(--acc);border-color:var(--acc)}
-.today-card{background:linear-gradient(135deg,rgba(74,222,128,.08),rgba(34,211,238,.05));border:1px solid rgba(74,222,128,.25);border-radius:var(--r);padding:14px;margin-bottom:12px}
-.today-card .tt{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:8px}
-.today-card .metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.today-card .metric .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:3px}
-.today-card .metric .val{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.3px}
-.today-card .metric .sub{font-size:10px;color:var(--muted);margin-top:2px}
-.today-card .up{color:var(--acc)}.today-card .down{color:var(--warn)}
 canvas{width:100%;height:130px;display:block;margin:8px 0}
 .pivot-wrap{overflow:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:12px;background:var(--surf2);max-height:60vh}
 .pivot-resize{height:16px;cursor:ns-resize;display:flex;justify-content:center;align-items:center;margin-top:4px;user-select:none;touch-action:none}
@@ -111,10 +102,6 @@ table.pivot .dot{display:inline-block;width:7px;height:7px;border-radius:2px;mar
 table.pivot .sub{font-size:10px;color:var(--muted);font-weight:400}
 table.pivot td.excl,table.pivot td.dim{opacity:.35;text-decoration:line-through}
 table.pivot td.tk.excl{opacity:.5;text-decoration:line-through}
-table.pivot td.tk .drag{display:inline-block;color:var(--muted);cursor:grab;font-size:11px;margin-right:5px;user-select:none;touch-action:none}
-table.pivot td.tk .drag:active{cursor:grabbing}
-table.pivot tr.dragging{opacity:.35}
-table.pivot tr.dragover td{border-top:2px solid var(--acc)}
 .cat-tot{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
 .cat-tot:last-child{border-bottom:0}
 .cat-tot .nm{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px}
@@ -122,34 +109,45 @@ table.pivot tr.dragover td{border-top:2px solid var(--acc)}
 .cat-tot .v{font-weight:700;color:var(--acc);font-variant-numeric:tabular-nums}
 .cat-item{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
 .cat-item:last-child{border-bottom:0}
-.cat-item .arrow{color:var(--muted);font-size:10px;width:14px;flex:0 0 auto;transition:transform .15s;display:inline-block;cursor:pointer}
-.cat-item .arrow.open{transform:rotate(90deg)}
+.cat-item .tog{color:var(--muted);font-size:16px;width:20px;flex:0 0 auto;cursor:pointer;text-align:center;font-weight:700;line-height:1}
 .cat-item .nm{flex:1;font-weight:600;font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cat-item .sys{font-size:9px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:1px 4px;text-transform:uppercase;letter-spacing:.5px}
 .sub-item{padding:6px 0 6px 30px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line)}
 .sub-item:last-child{border-bottom:0}
 .icon-btn{background:transparent;border:0;color:var(--muted);padding:6px;font-size:13px;width:auto;flex:0 0 auto;border-radius:8px}
 .icon-btn:hover{background:var(--surf2);color:var(--fg)}
-.modal-back{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:50;display:grid;place-items:end center;animation:fade .15s}
-.modal{background:var(--surf);width:100%;max-width:640px;border-radius:20px 20px 0 0;padding:20px;max-height:92vh;overflow-y:auto;animation:up .25s cubic-bezier(.2,.9,.3,1)}
-@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+.modal-back{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:50;display:grid;place-items:start center;animation:fade .15s;overflow-y:auto}
+.modal{background:var(--surf);width:100%;max-width:640px;border-radius:0 0 20px 20px;padding:20px;max-height:92vh;overflow-y:auto;animation:down .25s cubic-bezier(.2,.9,.3,1)}
+@keyframes down{from{transform:translateY(-100%)}to{transform:none}}
 .modal h3{margin:0 0 14px;font-size:16px;font-weight:700}
 .modal h4{margin:14px 0 8px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
 .modal .row{margin-top:16px}
 .ws-item{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--surf2);border:1px solid var(--line);border-radius:10px;margin-bottom:8px;cursor:pointer;font-weight:600;font-size:14px}
 .ws-item.on{border-color:var(--acc);background:rgba(74,222,128,.06)}
 .ws-item .del{color:var(--warn);font-size:12px;font-weight:600;padding:4px 8px;background:transparent;border:0;border-radius:6px}
-.swatch-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;margin-top:6px}
-.swatch{width:100%;aspect-ratio:1;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:transform .1s}
-.swatch:hover{transform:scale(1.1)}
+
+.color-picker-btn{display:flex;align-items:center;gap:10px;background:var(--surf2);border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;width:auto;color:var(--fg);font-weight:600;font-size:13px;transition:border-color .15s}
+.color-picker-btn:hover{border-color:var(--acc)}
+.color-preview{width:22px;height:22px;border-radius:6px;flex:0 0 auto;border:1px solid rgba(255,255,255,.15)}
+.color-grid-wrap{margin-top:8px;background:var(--surf2);border:1px solid var(--line);border-radius:10px;padding:10px}
+.color-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.swatch{width:100%;aspect-ratio:1;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:transform .1s}
+.swatch:hover{transform:scale(1.08)}
 .swatch.sel{border-color:var(--fg);box-shadow:0 0 0 2px var(--acc)}
+
 .session-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px}
 .session-row:last-child{border-bottom:0}
-.session-row .st{color:var(--muted);font-variant-numeric:tabular-nums;min-width:110px}
+.session-row .st{color:var(--muted);font-variant-numeric:tabular-nums;min-width:120px}
 .session-row .sd{color:var(--acc);font-weight:700;font-variant-numeric:tabular-nums;min-width:70px;text-align:right}
 .session-row .sn{flex:1;color:var(--fg);font-size:12px;line-height:1.4}
 .session-row .sn.empty{color:var(--muted);font-style:italic}
 .session-row .edit{background:transparent;border:0;color:var(--muted);font-size:11px;padding:2px 6px;width:auto;flex:0 0 auto}
+
+.filter-row{display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;font-size:13px}
+.filter-row input[type=checkbox]{width:auto;flex:0 0 auto}
+.filter-cat-head{display:flex;align-items:center;gap:6px;margin:12px 0 6px;font-weight:700;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.filter-cat-head .dot{width:8px;height:8px;border-radius:3px}
+.filter-actions{display:flex;gap:8px;margin-bottom:10px}
+.filter-actions button{flex:1;padding:8px;font-size:12px}
 </style>
 </head>
 <body>
@@ -198,17 +196,13 @@ table.pivot tr.dragover td{border-top:2px solid var(--acc)}
 </section>
 
 <section id="s-compare">
-  <div class="today-card">
-    <div class="tt">Today at a glance</div>
-    <div class="metrics" id="todayMetrics"></div>
-  </div>
   <div class="card">
     <div class="range-row">
       <label for="dDays">Last</label>
       <input type="number" id="dDays" min="1" max="50" value="7">
       <label>days</label>
-      <label class="routine-toggle" id="routineToggleLbl"><input type="checkbox" id="showRoutine"> Show Routine</label>
-      <button class="btn ghost" id="dCopy" style="flex:0 0 auto;width:auto;margin-left:auto">Copy</button>
+      <button class="btn ghost" id="dFilter" style="flex:0 0 auto;width:auto;margin-left:auto">Filter</button>
+      <button class="btn ghost" id="dCopy" style="flex:0 0 auto;width:auto">Copy</button>
     </div>
     <div class="row" style="align-items:center;gap:10px">
       <div><div class="muted">Total in range</div><div class="big" id="dTotal">0m</div></div>
@@ -219,7 +213,7 @@ table.pivot tr.dragover td{border-top:2px solid var(--acc)}
     <h2>Day-by-day by task</h2>
     <div class="pivot-wrap" id="pivotWrap"></div>
     <div class="pivot-resize" id="pivotResize"><div class="grip"></div></div>
-    <p class="muted" style="margin-top:6px">Drag rows to reorder. Click a task or a cell → sessions + notes.</p>
+    <p class="muted" style="margin-top:6px">Click a task name or a cell → sessions + notes. Use Filter to hide tasks.</p>
   </div>
   <div class="card"><h2>By category</h2><div id="dByCat"></div></div>
 </section>
@@ -230,8 +224,14 @@ table.pivot tr.dragover td{border-top:2px solid var(--acc)}
     <label>Name</label>
     <input id="cName" placeholder="Category name">
     <label>Color</label>
-    <div class="swatch-grid" id="swatchGrid"></div>
-    <div style="height:10px"></div>
+    <button class="color-picker-btn" id="cColorBtn">
+      <span class="color-preview" id="cColorPreview"></span>
+      <span>Choose color</span>
+    </button>
+    <div class="color-grid-wrap hidden" id="cColorWrap">
+      <div class="color-grid" id="cColorGrid"></div>
+    </div>
+    <div style="height:12px"></div>
     <button class="btn primary" id="cAdd">Add category</button>
   </div>
   <div class="card" id="catList"></div>
@@ -297,7 +297,17 @@ function colLetter(n){let s='';while(n>0){const r=(n-1)%26;s=String.fromCharCode
 function rnd(){return 'ws_'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);}
 function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);};}
 
-const PALETTE=['#4ade80','#22c55e','#16a34a','#84cc16','#a3e635','#eab308','#facc15','#f59e0b','#f97316','#ea580c','#ef4444','#dc2626','#f87171','#fb7185','#f472b6','#ec4899','#d946ef','#c026d3','#a855f7','#9333ea','#8b5cf6','#6366f1','#3b82f6','#2563eb','#0ea5e9','#06b6d4','#22d3ee','#14b8a6','#10b981','#059669','#64748b','#475569','#a78bfa','#c084fc','#fbbf24','#fde047'];
+// 35 distinct mid-tone colors. One color per hue family. No light/dark pairs.
+// All chosen to be readable when used as text color on the dark background.
+const PALETTE=[
+  '#ef4444','#e8703c','#f59e0b','#eab308','#d4d416','#a3e635','#84cc16',
+  '#22c55e','#10b981','#14b8a6','#06b6d4','#0ea5e9','#3b82f6','#6366f1',
+  '#8b5cf6','#a855f7','#d946ef','#ec4899','#f43f5e','#f97316','#fb923c',
+  '#facc15','#a3e635','#4ade80','#2dd4bf','#22d3ee','#38bdf8','#60a5fa',
+  '#818cf8','#a78bfa','#c084fc','#e879f9','#f472b6','#fb7185','#a16207'
+];
+// Deduplicate just in case
+const UNIQUE_PALETTE=Array.from(new Set(PALETTE));
 
 let db=null;
 let wsId='personal';
@@ -305,13 +315,14 @@ let workspaces=[];
 let cats=[],subs=[],entries=[],pins=[],running=[];
 let daynotes={};
 let settings={display:'hm'};
-let wsSettings={taskOrder:[],pivotHeight:null,showRoutine:false};
+let wsSettings={pivotHeight:null,hiddenTasks:[]};
 let tick=null;
 let compareDays=7;
 let compareExclusions=new Set();
 let compareExcludedCells=new Set();
 let expandedCats=new Set();
-let newCatColor=PALETTE[0];
+let newCatColor='#4ade80';
+let colorPickerOpen=false;
 
 function loadWorkspaces(){try{const a=JSON.parse(localStorage.getItem('tt_workspaces')||'null');return Array.isArray(a)?a:null;}catch{return null;}}
 function saveWorkspaces(l){localStorage.setItem('tt_workspaces',JSON.stringify(l));}
@@ -362,23 +373,23 @@ async function seedIfEmpty(){
   if(cats.length)return;
   const d=[['Work','#4ade80'],['Learning','#60a5fa'],['Health','#f59e0b'],['Admin','#a78bfa'],['Family','#f472b6'],['Distraction','#f87171'],['Neutral','#94a3b8']];
   for(let i=0;i<d.length;i++)await put('categories',{name:d[i][0],color:d[i][1],sort:i});
-  await put('categories',{name:'Routine',color:'#64748b',sort:99,is_routine:true});
   cats=await getAll('categories');
 }
-async function ensureRoutineCat(){
-  if(cats.find(c=>c.is_routine))return;
-  await put('categories',{name:'Routine',color:'#64748b',sort:99,is_routine:true});
-  cats=await getAll('categories');
+async function loadWsSettings(){
+  try{
+    const r=await p(tx('settings').get('ws'));
+    if(r&&r.v){
+      wsSettings=Object.assign({pivotHeight:null,hiddenTasks:[]},r.v);
+      if(!Array.isArray(wsSettings.hiddenTasks))wsSettings.hiddenTasks=[];
+    }
+  }catch(_){}
 }
-async function loadWsSettings(){try{const r=await p(tx('settings').get('ws'));if(r&&r.v)wsSettings=Object.assign(wsSettings,r.v);}catch(_){}}
 async function saveWsSettings(){await put('settings',{k:'ws',v:wsSettings});}
 
 const catById=id=>cats.find(c=>c.id===id);
 const subById=id=>subs.find(s=>s.id===id);
-const routineCat=()=>cats.find(c=>c.is_routine);
 const taskKey=(c,s,w)=>c+'|'+(s||'')+'|'+w;
 
-// Midnight-aware slicing: minutes of entry falling inside [dayStart, dayEnd]
 function sliceMinutes(entry,dayStart,dayEnd){
   const s=Math.max(entry.start,dayStart);
   const e=Math.min(entry.end||nowMs(),dayEnd);
@@ -391,8 +402,6 @@ function sliceRange(entry,dayStart,dayEnd){
   if(e<=s)return null;
   return [s,e];
 }
-
-function updateClock(){}
 
 function bindTabs(){
   $$('nav button').forEach(b=>b.onclick=()=>{
@@ -461,7 +470,6 @@ async function switchWorkspace(id){
   await openDB(id);
   await loadWorkspaceData();
   await seedIfEmpty();
-  await ensureRoutineCat();
   await loadWsSettings();
   renderAll();startTicker();renderWorkspaceName();
 }
@@ -499,8 +507,6 @@ function fillCatSelect(){
 }
 function fillSubSelect(){
   const cid=Number($('#tCat').value);const sel=$('#tSub');
-  const c=catById(cid);
-  if(c&&c.is_routine){sel.innerHTML='<option value="">— n/a —</option>';return;}
   sel.innerHTML='<option value="">— none —</option>';
   subs.filter(s=>s.category_id===cid).forEach(s=>{const o=document.createElement('option');o.value=s.id;o.textContent=s.name;sel.appendChild(o);});
 }
@@ -542,7 +548,7 @@ async function togglePin(pin){
   await refreshEntries();renderAll();
 }
 function openPinModal(){
-  const catOpts=cats.filter(c=>!c.is_routine).map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  const catOpts=cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
   const back=el('div','modal-back');
   const modal=el('div','modal');
   modal.innerHTML=`<h3>Pin a task</h3>
@@ -590,6 +596,7 @@ function startTicker(){
     if(running.length){
       running.forEach(e=>{const row=document.getElementById('run-'+e.id);if(row){const x=row.querySelector('.elapsed');if(x)x.textContent=dispDur(durMin(e.start,nowMs()));}});
       renderPins();
+      renderLog();
     }
     updateTodayPill();
   },1000);
@@ -608,14 +615,12 @@ function renderLog(){
   const box=$('#entriesList');box.innerHTML='';
   const byDay={};
   for(const e of entries){
-    // Split across IST midnights
     const startDayKey=istDateKey(e.start);
     const endMs=e.end||nowMs();
     const endDayKey=istDateKey(endMs);
     if(startDayKey===endDayKey){
       (byDay[startDayKey]=byDay[startDayKey]||[]).push({entry:e,sliceStart:e.start,sliceEnd:endMs,split:false});
     }else{
-      // Break into per-day slices
       let curStart=e.start;
       let curDayKey=startDayKey;
       while(true){
@@ -639,7 +644,6 @@ function renderLog(){
     const head=el('div','day-head');
     head.innerHTML=`<div class="d">${istDateFull(dObj)}</div><div class="t">${dispDur(dayTotal)}</div>`;
     card.appendChild(head);
-    // Group by entry-level task key, but sessions are per-slice
     const groups={};
     for(const s of daySlices){
       const key=taskKey(s.entry.category_id,s.entry.subcategory_id,s.entry.work_name);
@@ -660,8 +664,10 @@ function renderLog(){
       th.innerHTML=`<div class="tn"><span class="dot" style="background:${c.color}"></span><span class="tt2">${arr[0].entry.work_name}${sb?' <span class="muted">('+sb.name+')</span>':''}</span></div><div class="t">${dispDur(tot)}</div>`;
       grp.appendChild(th);
       for(const s of arr){
-        const row=el('div','sess'+(s.split?' split':''));
-        row.innerHTML=`<div class="st">${istTime(s.sliceStart)} → ${istTime(s.sliceEnd)}${s.split?'<span class="tag">split</span>':''}</div>
+        const isRunning=!s.entry.end;
+        const timeStr=isRunning?`${istTime(s.sliceStart)} →`:`${istTime(s.sliceStart)} → ${istTime(s.sliceEnd)}`;
+        const row=el('div','sess'+(s.split?' split':'')+(isRunning?' running':''));
+        row.innerHTML=`<div class="st">${timeStr}${s.split?'<span class="tag">split</span>':''}</div>
           <div class="sd">${dispDur(durMin(s.sliceStart,s.sliceEnd))}</div>
           <button class="sx">Edit</button>`;
         row.querySelector('.sx').onclick=()=>openEntryModal(s.entry,false);
@@ -683,7 +689,7 @@ function renderLog(){
 }
 
 function openEntryModal(entry,isNew){
-  const catOpts=cats.map(c=>`<option value="${c.id}" ${c.id===entry.category_id?'selected':''}>${c.name}${c.is_routine?' (routine)':''}</option>`).join('');
+  const catOpts=cats.map(c=>`<option value="${c.id}" ${c.id===entry.category_id?'selected':''}>${c.name}</option>`).join('');
   const subOpts='<option value="">— none —</option>'+subs.filter(s=>s.category_id===entry.category_id).map(s=>`<option value="${s.id}" ${s.id===entry.subcategory_id?'selected':''}>${s.name}</option>`).join('');
   const startL=istLocalInput(entry.start);const endL=entry.end?istLocalInput(entry.end):'';
   const back=el('div','modal-back');
@@ -743,16 +749,7 @@ function bindCompare(){
     inp.value=n;compareDays=n;renderCompare();
   };
   $('#dCopy').onclick=copyPivot;
-  const rt=$('#showRoutine');
-  rt.checked=!!wsSettings.showRoutine;
-  const lbl=$('#routineToggleLbl');
-  if(rt.checked)lbl.classList.add('on');
-  rt.onchange=async()=>{
-    wsSettings.showRoutine=rt.checked;
-    await saveWsSettings();
-    lbl.classList.toggle('on',rt.checked);
-    renderCompare();
-  };
+  $('#dFilter').onclick=openFilterModal;
   setupResize();
 }
 function setupResize(){
@@ -772,6 +769,68 @@ function setupResize(){
   });
 }
 
+function openFilterModal(){
+  const days=lastNDays(compareDays);
+  const dayStart=days.map(d=>istMidnight(d));
+  const dayEnd=dayStart.map(s=>s+86400000-1);
+  const fromMs=dayStart[0];
+  const toMs=nowMs();
+  const taskMap=new Map();
+  for(const e of entries){
+    const en=e.end||nowMs();
+    if(en<fromMs||e.start>toMs)continue;
+    taskMap.set(taskKey(e.category_id,e.subcategory_id,e.work_name),{c:e.category_id,w:e.work_name,key:taskKey(e.category_id,e.subcategory_id,e.work_name)});
+  }
+  const byCat={};
+  for(const t of taskMap.values()){
+    (byCat[t.c]=byCat[t.c]||[]).push(t);
+  }
+  const hidden=new Set(wsSettings.hiddenTasks||[]);
+  const back=el('div','modal-back');
+  const modal=el('div','modal');
+  modal.innerHTML=`<h3>Filter tasks</h3>
+    <p class="muted" style="margin:0 0 12px">Uncheck tasks to hide them from the Compare pivot. Logs are unaffected.</p>
+    <div class="filter-actions">
+      <button class="btn ghost" id="fltAll">Show all</button>
+      <button class="btn ghost" id="fltNone">Hide all</button>
+    </div>
+    <div id="fltList"></div>
+    <div class="row"><button class="btn primary" id="fltClose">Done</button></div>`;
+  back.appendChild(modal);document.body.appendChild(back);
+  const list=modal.querySelector('#fltList');
+  const checkboxes=[];
+  const catKeys=Object.keys(byCat).sort((a,b)=>(catById(Number(a))?.name||'').localeCompare(catById(Number(b))?.name||''));
+  if(!catKeys.length)list.appendChild(el('div','muted','No tasks in range.'));
+  for(const cid of catKeys){
+    const c=catById(Number(cid))||{name:'?',color:'#888'};
+    const head=el('div','filter-cat-head');
+    head.innerHTML=`<span class="dot" style="background:${c.color}"></span>${c.name}`;
+    list.appendChild(head);
+    byCat[cid].sort((a,b)=>a.w.localeCompare(b.w));
+    for(const t of byCat[cid]){
+      const row=el('label','filter-row');
+      const cb=document.createElement('input');
+      cb.type='checkbox';
+      cb.checked=!hidden.has(t.key);
+      cb.dataset.key=t.key;
+      cb.onchange=()=>{if(cb.checked)hidden.delete(t.key);else hidden.add(t.key);};
+      checkboxes.push(cb);
+      row.appendChild(cb);
+      row.appendChild(document.createTextNode(t.w));
+      list.appendChild(row);
+    }
+  }
+  modal.querySelector('#fltAll').onclick=()=>{hidden.clear();checkboxes.forEach(cb=>cb.checked=true);};
+  modal.querySelector('#fltNone').onclick=()=>{checkboxes.forEach(cb=>{cb.checked=false;hidden.add(cb.dataset.key);});};
+  modal.querySelector('#fltClose').onclick=async()=>{
+    wsSettings.hiddenTasks=Array.from(hidden);
+    await saveWsSettings();
+    back.remove();
+    renderCompare();
+  };
+  back.onclick=e=>{if(e.target===back)back.remove();};
+}
+
 function renderCompare(){
   const days=lastNDays(compareDays);
   const todayKey=istDateKey(nowMs());
@@ -780,7 +839,6 @@ function renderCompare(){
   const fromMs=dayStart[0];
   const toMs=nowMs();
 
-  // Build task set from entries only (no empty pins)
   const taskMap=new Map();
   for(const e of entries){
     const en=e.end||nowMs();
@@ -788,7 +846,6 @@ function renderCompare(){
     taskMap.set(taskKey(e.category_id,e.subcategory_id,e.work_name),{c:e.category_id,s:e.subcategory_id||null,w:e.work_name});
   }
 
-  // Aggregate minutes per task per day using slice
   const agg={};
   for(const e of entries){
     const key=taskKey(e.category_id,e.subcategory_id,e.work_name);
@@ -802,22 +859,13 @@ function renderCompare(){
   for(const {c,s,w} of taskMap.values()){
     const key=taskKey(c,s,w);const per={};let total=0;
     for(const d of days){const v=agg[key+'|'+d]||0;per[d]=v;total+=v;}
-    if(total<=0)continue; // hide empty tasks
+    if(total<=0)continue;
     allRows.push({key,c,s,w,per,total});
   }
-  // Split routine and non-routine
-  const routineRows=allRows.filter(r=>{const c=catById(r.c);return c&&c.is_routine;});
-  const normalRows=allRows.filter(r=>{const c=catById(r.c);return !c||!c.is_routine;});
-  const visibleRows=wsSettings.showRoutine?[...normalRows,...routineRows]:normalRows;
 
-  const order=wsSettings.taskOrder||[];
-  visibleRows.sort((a,b)=>{
-    const ia=order.indexOf(a.key),ib=order.indexOf(b.key);
-    if(ia>=0&&ib>=0)return ia-ib;
-    if(ia>=0)return -1;
-    if(ib>=0)return 1;
-    return b.total-a.total;
-  });
+  const hiddenSet=new Set(wsSettings.hiddenTasks||[]);
+  const visibleRows=allRows.filter(r=>!hiddenSet.has(r.key));
+  visibleRows.sort((a,b)=>b.total-a.total);
 
   const colTotals={};for(const d of days)colTotals[d]=0;
   let grand=0;
@@ -835,43 +883,12 @@ function renderCompare(){
   drawChart(days.map(d=>colTotals[d]));
   renderPivot(days,visibleRows,colTotals,grand,todayKey);
   renderByCat(allRows);
-  renderTodayCard();
-}
-
-function renderTodayCard(){
-  const todayKey=istDateKey(nowMs());
-  const dStart=istMidnight(todayKey),dEnd=dStart+86400000-1;
-  const yKey=istDateKey(nowMs()-86400000);
-  const yStart=istMidnight(yKey),yEnd=yStart+86400000-1;
-  const todayAgg={},yAgg={};
-  let todayTotal=0,yTotal=0;
-  for(const e of entries){
-    const v=sliceMinutes(e,dStart,dEnd);
-    if(v>0){todayTotal+=v;const key=taskKey(e.category_id,e.subcategory_id,e.work_name);todayAgg[key]=(todayAgg[key]||0)+v;}
-    const vy=sliceMinutes(e,yStart,yEnd);
-    if(vy>0){yTotal+=vy;const key=taskKey(e.category_id,e.subcategory_id,e.work_name);yAgg[key]=(yAgg[key]||0)+vy;}
-  }
-  let topKey=null,topMin=0;
-  for(const k of Object.keys(todayAgg)){if(todayAgg[k]>topMin){topMin=todayAgg[k];topKey=k;}}
-  let topName='—';
-  if(topKey){
-    const row=entries.find(e=>taskKey(e.category_id,e.subcategory_id,e.work_name)===topKey);
-    if(row)topName=row.work_name;
-  }
-  const delta=todayTotal-yTotal;
-  const deltaStr=(delta>=0?'+':'−')+dispDur(Math.abs(delta));
-  const deltaCls=delta>=0?'up':'down';
-  $('#todayMetrics').innerHTML=`
-    <div class="metric"><div class="lbl">Today</div><div class="val">${dispDur(todayTotal)}</div><div class="sub">since midnight</div></div>
-    <div class="metric"><div class="lbl">Top task</div><div class="val" style="font-size:13px">${topName}</div><div class="sub">${topMin?dispDur(topMin):'—'}</div></div>
-    <div class="metric"><div class="lbl">vs Yesterday</div><div class="val ${deltaCls}">${deltaStr}</div><div class="sub">yesterday ${dispDur(yTotal)}</div></div>
-  `;
 }
 
 function renderPivot(days,rows,colTotals,grand,todayKey){
   const wrap=$('#pivotWrap');wrap.innerHTML='';
   wrap.style.height=wsSettings.pivotHeight?wsSettings.pivotHeight+'px':'';
-  if(!rows.length){wrap.appendChild(el('div','muted','No data in this range yet.'));return;}
+  if(!rows.length){wrap.appendChild(el('div','muted','No data in this range yet. Use Filter to unhide tasks.'));return;}
   const tbl=el('table','pivot');
   const thead=el('thead');const trh=el('tr');
   trh.appendChild(el('th','tk','Task'));
@@ -893,14 +910,8 @@ function renderPivot(days,rows,colTotals,grand,todayKey){
     const taskExcl=compareExclusions.has(r.key);
     const tkCell=el('td','tk'+(taskExcl?' excl':''));
     tkCell.dataset.key=r.key;
-    tkCell.innerHTML=`<span class="drag" title="Drag to reorder">⋮⋮</span><span class="dot" style="background:${c.color}"></span><span class="tt">${r.w}${s?' <span class="sub">'+s.name+'</span>':''}</span>`;
-    tkCell.onclick=ev=>{
-      if(ev.target.classList.contains('drag'))return;
-      openTaskModal(r.key);
-    };
-    // drag handle
-    const handle=tkCell.querySelector('.drag');
-    handle.addEventListener('pointerdown',ev=>startRowDrag(ev,tr));
+    tkCell.innerHTML=`<span class="dot" style="background:${c.color}"></span><span class="tt">${r.w}${s?' <span class="sub">'+s.name+'</span>':''}</span>`;
+    tkCell.onclick=()=>openTaskModal(r.key);
     tr.appendChild(tkCell);
 
     for(const d of days){
@@ -941,57 +952,6 @@ function renderPivot(days,rows,colTotals,grand,todayKey){
   tbl.appendChild(tb);wrap.appendChild(tbl);
 }
 
-// Row drag reorder (pointer events, works on mouse + touch)
-let dragState=null;
-function startRowDrag(ev,tr){
-  ev.preventDefault();
-  const tbody=tr.parentNode;
-  const rows=[...tbody.querySelectorAll('tr')].filter(r=>r.dataset.key);
-  const keys=rows.map(r=>r.dataset.key);
-  const idx=keys.indexOf(tr.dataset.key);
-  if(idx<0)return;
-  dragState={fromIdx:idx,tr,tbody,rows,startY:ev.clientY,currentIdx:idx};
-  tr.classList.add('dragging');
-  document.addEventListener('pointermove',onRowDragMove);
-  document.addEventListener('pointerup',onRowDragEnd);
-}
-function onRowDragMove(ev){
-  if(!dragState)return;
-  const y=ev.clientY;
-  const rows=dragState.rows;
-  for(let i=0;i<rows.length;i++){
-    const r=rows[i];
-    const rect=r.getBoundingClientRect();
-    if(y>=rect.top&&y<=rect.bottom){
-      if(dragState.currentIdx!==i){
-        rows.forEach(x=>x.classList.remove('dragover'));
-        r.classList.add('dragover');
-        dragState.currentIdx=i;
-      }
-      return;
-    }
-  }
-}
-async function onRowDragEnd(){
-  document.removeEventListener('pointermove',onRowDragMove);
-  document.removeEventListener('pointerup',onRowDragEnd);
-  if(!dragState)return;
-  const {fromIdx,currentIdx,tbody,rows,tr}=dragState;
-  rows.forEach(x=>x.classList.remove('dragover'));
-  tr.classList.remove('dragging');
-  dragState=null;
-  if(fromIdx===currentIdx)return;
-  const keys=rows.map(r=>r.dataset.key);
-  const [moved]=keys.splice(fromIdx,1);
-  keys.splice(currentIdx,0,moved);
-  // Preserve any existing order for keys not in this view
-  const prev=wsSettings.taskOrder||[];
-  const extras=prev.filter(k=>!keys.includes(k));
-  wsSettings.taskOrder=[...keys,...extras];
-  await saveWsSettings();
-  renderCompare();
-}
-
 function renderByCat(rows){
   const byCat={};
   for(const r of rows){
@@ -1009,12 +969,11 @@ function renderByCat(rows){
   for(const [cid,v] of arr){
     const c=catById(Number(cid))||{name:'?',color:'#888'};
     const row=el('div','cat-tot');
-    row.innerHTML=`<div class="nm"><span class="sw" style="background:${c.color}"></span>${c.name}${c.is_routine?' <span class="muted">(routine)</span>':''}</div><div class="v">${dispDur(v)}</div>`;
+    row.innerHTML=`<div class="nm"><span class="sw" style="background:${c.color}"></span>${c.name}</div><div class="v">${dispDur(v)}</div>`;
     box.appendChild(row);
   }
 }
 
-// Modal: sessions + notes for a specific task in current range
 function openTaskModal(key){
   const [cid,sub,w]=key.split('|');
   const cidN=Number(cid);
@@ -1026,11 +985,10 @@ function openTaskModal(key){
   const dEnd=dStart.map(s=>s+86400000-1);
   const back=el('div','modal-back');
   const modal=el('div','modal');
-  let total=0;
-  let html=`<h3>${c.name}${s?' / '+s.name:''}</h3><div style="font-size:14px;font-weight:700;margin-bottom:10px">${w}</div>`;
-  html+=`<div class="muted" style="margin-bottom:10px">Last ${compareDays} days</div>`;
-  html+=`<h4>Per day</h4><div id="tmDays"></div><h4>Sessions &amp; notes</h4><div id="tmSessions"></div>`;
-  modal.innerHTML=html;
+  modal.innerHTML=`<h3>${c.name}${s?' / '+s.name:''}</h3><div style="font-size:14px;font-weight:700;margin-bottom:10px">${w}</div>
+    <div class="muted" style="margin-bottom:10px">Last ${compareDays} days</div>
+    <h4>Per day</h4><div id="tmDays"></div>
+    <h4>Sessions &amp; notes</h4><div id="tmSessions"></div>`;
   back.appendChild(modal);document.body.appendChild(back);
   const dayBox=modal.querySelector('#tmDays');
   const sessBox=modal.querySelector('#tmSessions');
@@ -1042,26 +1000,21 @@ function openTaskModal(key){
       if((e.subcategory_id||null)!==(subN||null))continue;
       if(e.work_name!==w)continue;
       const v=sliceMinutes(e,dStart[i],dEnd[i]);
-      if(v>0){sum+=v;const r=sliceRange(e,dStart[i],dEnd[i]);if(r)slices.push({e,r});}
+      if(v>0){sum+=v;const r=sliceRange(e,dStart[i],dEnd[i]);if(r)slices.push({e,r,d});}
     }
-    total+=sum;
     return {d,sum,slices};
   });
+  let any=false;
   dayRows.forEach(({d,sum})=>{
-    if(!sum)return;
+    if(!sum)return;any=true;
     const row=el('div','session-row');
     const dObj=istMidnight(d);
     row.innerHTML=`<div class="st">${istWeekday(dObj)} ${istDateShort(dObj)}</div><div class="sn"></div><div class="sd">${dispDur(sum)}</div>`;
     dayBox.appendChild(row);
   });
-  if(!dayBox.children.length)dayBox.appendChild(el('div','muted','No time in range.'));
-  // Sessions flat list with notes
+  if(!any)dayBox.appendChild(el('div','muted','No time in range.'));
   const flat=[];
-  for(const {d,slices} of dayRows){
-    for(const {e,r} of slices){
-      flat.push({d,e,r});
-    }
-  }
+  for(const {d,slices} of dayRows){for(const {e,r} of slices){flat.push({d,e,r});}}
   flat.sort((a,b)=>a.r[0]-b.r[0]);
   if(!flat.length)sessBox.appendChild(el('div','muted','No sessions.'));
   for(const {d,e,r} of flat){
@@ -1082,7 +1035,6 @@ function openTaskModal(key){
   back.onclick=e=>{if(e.target===back)back.remove();};
 }
 
-// Modal: sessions + notes for a specific task on a specific day
 function openCellModal(key,dayKey){
   const [cid,sub,w]=key.split('|');
   const cidN=Number(cid);
@@ -1217,17 +1169,27 @@ function extractMinutes(txt){
 }
 
 function bindCategories(){
-  const grid=$('#swatchGrid');
-  PALETTE.forEach((col,i)=>{
-    const s=el('div','swatch'+(i===0?' sel':''));
+  const grid=$('#cColorGrid');
+  grid.innerHTML='';
+  UNIQUE_PALETTE.forEach((col,i)=>{
+    const s=el('div','swatch'+(col===newCatColor?' sel':''));
     s.style.background=col;
     s.onclick=()=>{
       newCatColor=col;
       grid.querySelectorAll('.swatch').forEach(x=>x.classList.remove('sel'));
       s.classList.add('sel');
+      $('#cColorPreview').style.background=col;
+      // Close picker after selection
+      $('#cColorWrap').classList.add('hidden');
+      colorPickerOpen=false;
     };
     grid.appendChild(s);
   });
+  $('#cColorPreview').style.background=newCatColor;
+  $('#cColorBtn').onclick=()=>{
+    colorPickerOpen=!colorPickerOpen;
+    $('#cColorWrap').classList.toggle('hidden',!colorPickerOpen);
+  };
   $('#cAdd').onclick=async()=>{
     const n=$('#cName').value.trim();if(!n)return;
     await put('categories',{name:n,color:newCatColor,sort:cats.length});
@@ -1241,48 +1203,38 @@ function renderCategories(){
     const isOpen=expandedCats.has(c.id);
     const row=el('div','cat-item');
     row.innerHTML=`
-      <span class="arrow${isOpen?' open':''}">▶</span>
+      <span class="tog">${isOpen?'−':'+'}</span>
       <span style="width:12px;height:12px;border-radius:4px;background:${c.color};flex:0 0 auto"></span>
       <span class="nm">${c.name}</span>
-      ${c.is_routine?'<span class="sys">system</span>':''}
-      ${c.is_routine?'':`
-        <button class="icon-btn" data-a="sub" title="Add subcategory">+ sub</button>
-        <button class="icon-btn" data-a="ren">✎</button>
-        <button class="icon-btn" data-a="del" style="color:var(--warn)">×</button>`}`;
-    if(!c.is_routine){
-      row.querySelector('.arrow').onclick=ev=>{
-        ev.stopPropagation();
-        if(isOpen)expandedCats.delete(c.id);else expandedCats.add(c.id);
-        renderCategories();
-      };
-      row.querySelector('[data-a="sub"]').onclick=async ev=>{
-        ev.stopPropagation();
-        const n=prompt('Subcategory under "'+c.name+'"');
-        if(!n)return;
-        await put('subcategories',{category_id:c.id,name:n.trim(),sort:0});
-        subs=await getAll('subcategories');renderAll();
-      };
-      row.querySelector('[data-a="ren"]').onclick=async ev=>{
-        ev.stopPropagation();
-        const n=prompt('New name',c.name);if(!n)return;
-        c.name=n.trim();await put('categories',c);cats=await getAll('categories');renderAll();
-      };
-      row.querySelector('[data-a="del"]').onclick=async ev=>{
-        ev.stopPropagation();
-        const cnt=entries.filter(e=>e.category_id===c.id).length;
-        if(!confirm('Delete category "'+c.name+'"? '+cnt+' entries use it. Entries are NOT deleted.'))return;
-        await del('categories',c.id);cats=await getAll('categories');renderAll();
-      };
-    }else{
-      row.querySelector('.arrow').onclick=ev=>{
-        ev.stopPropagation();
-        if(isOpen)expandedCats.delete(c.id);else expandedCats.add(c.id);
-        renderCategories();
-      };
-    }
+      <button class="icon-btn" data-a="sub" title="Add subcategory">+ sub</button>
+      <button class="icon-btn" data-a="ren">✎</button>
+      <button class="icon-btn" data-a="del" style="color:var(--warn)">×</button>`;
+    row.querySelector('.tog').onclick=ev=>{
+      ev.stopPropagation();
+      if(isOpen)expandedCats.delete(c.id);else expandedCats.add(c.id);
+      renderCategories();
+    };
+    row.querySelector('[data-a="sub"]').onclick=async ev=>{
+      ev.stopPropagation();
+      const n=prompt('Subcategory under "'+c.name+'"');
+      if(!n)return;
+      await put('subcategories',{category_id:c.id,name:n.trim(),sort:0});
+      subs=await getAll('subcategories');renderAll();
+    };
+    row.querySelector('[data-a="ren"]').onclick=async ev=>{
+      ev.stopPropagation();
+      const n=prompt('New name',c.name);if(!n)return;
+      c.name=n.trim();await put('categories',c);cats=await getAll('categories');renderAll();
+    };
+    row.querySelector('[data-a="del"]').onclick=async ev=>{
+      ev.stopPropagation();
+      const cnt=entries.filter(e=>e.category_id===c.id).length;
+      if(!confirm('Delete category "'+c.name+'"? '+cnt+' entries use it. Entries are NOT deleted.'))return;
+      await del('categories',c.id);cats=await getAll('categories');renderAll();
+    };
     box.appendChild(row);
 
-    if(isOpen&&!c.is_routine){
+    if(isOpen){
       const mySubs=subs.filter(s=>s.category_id===c.id);
       if(!mySubs.length)box.appendChild(el('div','sub-item','No subcategories.'));
       for(const s of mySubs){
@@ -1376,13 +1328,12 @@ async function doImport(file){
     const catMap={};
     if(Array.isArray(data.categories)){
       for(const c of data.categories){
-        const id=await put('categories',{name:c.name,color:c.color||'#888',sort:c.sort||0,is_routine:!!c.is_routine});
+        const id=await put('categories',{name:c.name,color:c.color||'#888',sort:c.sort||0});
         catMap[c.id||c.name]=id;
       }
     }
     cats=await getAll('categories');
     if(!cats.length)await seedIfEmpty();
-    await ensureRoutineCat();
     const subMap={};
     if(Array.isArray(data.subcategories)){
       for(const s of data.subcategories){
@@ -1461,7 +1412,6 @@ async function init(){
   await openDB(wsId);
   await loadWorkspaceData();
   await seedIfEmpty();
-  await ensureRoutineCat();
   await loadWsSettings();
   bindTabs();bindTimer();bindLog();bindCompare();bindCategories();bindSettings();
   renderAll();startTicker();
